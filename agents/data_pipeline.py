@@ -107,6 +107,19 @@ def refresh_all(commodity_keys: list[str] = None) -> dict:
         if freshness.get("status") == "stale":
             logger.warning(f"{cfg.name} data is {freshness['age_days']} days old!")
 
+        # Log to database
+        try:
+            from db import get_db
+            get_db().log_data_health(
+                commodity=key,
+                latest_data_date=freshness.get("latest_date", ""),
+                age_days=freshness.get("age_days", -1),
+                status=freshness.get("status", "unknown"),
+                fetch_results=fetch_results,
+            )
+        except Exception as e:
+            logger.warning(f"DB health log failed: {e}")
+
         report["commodities"][key] = commodity_report
 
     # Summary

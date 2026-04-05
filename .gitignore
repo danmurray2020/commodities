@@ -18,6 +18,11 @@ research/
 
 # Keep production models + metadata (needed for remote agents)
 
+# Database (regenerated, local state)
+db/commodities.db
+db/commodities.db-wal
+db/commodities.db-shm
+
 # Tools state
 tools/*.json
 tools/*.log

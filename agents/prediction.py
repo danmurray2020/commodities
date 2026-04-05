@@ -116,7 +116,28 @@ print(json.dumps(result))
 
 
 def log_prediction(prediction: dict):
-    """Append prediction to the audit log."""
+    """Log prediction to both database and JSONL file."""
+    # Database (primary)
+    try:
+        from db import get_db
+        db = get_db()
+        cfg_key = prediction.get("commodity", "").lower().replace(" ", "")
+        db.log_prediction(
+            commodity=cfg_key,
+            as_of_date=prediction.get("date", ""),
+            price=prediction.get("price", 0),
+            pred_return=prediction.get("pred_return", 0),
+            direction=prediction.get("direction", ""),
+            confidence=prediction.get("confidence", 0),
+            horizon_days=prediction.get("horizon", 63),
+            threshold=prediction.get("threshold"),
+            is_signal=prediction.get("signal", False),
+            model_version=prediction.get("version"),
+        )
+    except Exception as e:
+        logger.warning(f"DB log failed: {e}")
+
+    # JSONL fallback
     PREDICTIONS_LOG.parent.mkdir(exist_ok=True)
     entry = {
         "timestamp": datetime.now().isoformat(),

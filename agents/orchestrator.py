@@ -56,6 +56,14 @@ def run_weekly(
     """
     results = {"timestamp": datetime.now().isoformat()}
 
+    # Log agent run to database
+    run_id = None
+    try:
+        from db import get_db
+        run_id = get_db().start_agent_run("orchestrator", commodity_keys)
+    except Exception:
+        pass
+
     # ── Step 1: Data refresh ──────────────────────────────────
     if not skip_refresh:
         logger.info("=" * 60)
@@ -144,6 +152,18 @@ def run_weekly(
             print(f"  - {w}")
 
     print(f"\nReports saved to: {REPORTS_DIR}")
+
+    # Finish agent run in database
+    if run_id:
+        try:
+            n_signals = len(trade_plan.get("signals", {}))
+            summary = f"{n_signals} signals, exposure={trade_plan.get('total_exposure', 0):.1%}"
+            if warnings:
+                summary += f", {len(warnings)} warnings"
+            get_db().finish_agent_run(run_id, "ok", summary=summary, report=results)
+        except Exception:
+            pass
+
     return results
 
 
