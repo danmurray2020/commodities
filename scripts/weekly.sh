@@ -13,31 +13,45 @@ cd "$REPO_DIR"
 
 echo "[$DATE] Starting weekly pipeline..." >> "$LOG_DIR/cron.log"
 
-# Full weekly pipeline
+# === FULL WEEKLY PIPELINE ===
+# Orchestrator: refresh → predict → strategy → monitor
 WEEKLY_OUTPUT=$(python3 -m agents weekly 2>&1)
 echo "$WEEKLY_OUTPUT" > "$LOG_DIR/weekly_${DATE}.txt"
 
-# Research baselines
-RESEARCH_OUTPUT=$(python3 -m agents research --baselines 2>&1)
-echo "$RESEARCH_OUTPUT" > "$LOG_DIR/research_${DATE}.txt"
+# === WEEKLY ANALYSIS ===
+# Research baselines + regime + alpha decay + backtests + risk + compliance
+ANALYSIS=$(
+  python3 -m agents research --baselines 2>&1
+  python3 -m agents regime 2>&1
+  python3 -m agents alpha 2>&1
+  python3 -m agents backtest 2>&1
+  python3 -m agents risk 2>&1
+  python3 -m agents execute --roll-calendar 2>&1
+  python3 -m agents pnl --scenarios 2>&1
+  python3 -m agents compliance 2>&1
+  python3 -m agents infra 2>&1
+)
+echo "$ANALYSIS" >> "$LOG_DIR/weekly_${DATE}.txt"
 
-# DB status
+# === DB STATUS ===
 DB_OUTPUT=$(python3 -m db predictions 2>&1 && python3 -m db health 2>&1)
 
-# Combine and send to Claude for Slack
+# Send to Claude for Slack
 cat <<EOF | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__claude_ai_Slack__slack_send_message,mcp__claude_ai_Slack__slack_search_users' -p \
   "Here is this week's full commodities pipeline output. Send a Slack DM to user ID U07BRUFVDDE with a weekly summary.
 
-Format with sections: SIGNALS, HEALTH, PERFORMANCE, RECOMMENDATIONS.
+Format with sections: SIGNALS & P&L FORECAST, RISK, REGIME & ALPHA, BACKTESTS, COMPLIANCE, RECOMMENDATIONS.
 Include position sizes and total exposure for signals.
 Flag any model with alpha < 2% vs majority baseline.
+Flag any commodity the alpha agent recommends suspending.
+Include upcoming roll dates from execution agent.
 Keep under 2000 characters." \
   >> "$LOG_DIR/cron.log" 2>&1
 === WEEKLY PIPELINE ===
 $WEEKLY_OUTPUT
 
-=== RESEARCH ===
-$RESEARCH_OUTPUT
+=== ANALYSIS ===
+$ANALYSIS
 
 === DATABASE ===
 $DB_OUTPUT
