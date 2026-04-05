@@ -1,8 +1,10 @@
 """Fetch historical cocoa futures data and supplementary market data."""
 
-import yfinance as yf
+import sys
 import pandas as pd
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from agents.retry import download_with_retry
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -10,9 +12,7 @@ DATA_DIR = Path(__file__).parent / "data"
 def fetch_cocoa_prices(ticker: str = "CC=F", period: str = "10y") -> pd.DataFrame:
     """Download cocoa futures OHLCV data from Yahoo Finance."""
     print(f"Fetching {ticker} data for the last {period}...")
-    df = yf.download(ticker, period=period, auto_adjust=True)
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
+    df = download_with_retry(ticker, period=period)
     df.index.name = "Date"
     df = df.dropna()
     print(f"Fetched {len(df)} rows from {df.index.min()} to {df.index.max()}")
@@ -33,9 +33,7 @@ def fetch_supplementary_data() -> dict[str, pd.DataFrame]:
     supplementary = {}
     for name, ticker in tickers.items():
         print(f"Fetching {name} ({ticker})...")
-        df = yf.download(ticker, period="10y", auto_adjust=True)
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.get_level_values(0)
+        df = download_with_retry(ticker, period="10y")
         df.index.name = "Date"
         if not df.empty:
             supplementary[name] = df[["Close"]].rename(columns={"Close": name})

@@ -60,11 +60,22 @@ with open('models/production_metadata.json') as f:
 
 reg = joblib.load('models/production_regressor.joblib')
 clf = joblib.load('models/production_classifier.joblib')
-feature_cols = [f for f in meta['features'] if f in df.columns]
+feature_cols = meta['features']
 
-missing = set(meta['features']) - set(feature_cols)
+missing = [f for f in feature_cols if f not in df.columns]
 if missing:
-    print(json.dumps({{"error": f"missing features: {{missing}}"}}))
+    print(json.dumps({{"error": f"missing features: {{missing}}", "n_missing": len(missing), "n_expected": len(feature_cols)}}))
+    sys.exit(1)
+
+# Check for NaN/inf in latest row
+latest_check = df.iloc[-1][feature_cols]
+nan_cols = [c for c in feature_cols if pd.isna(latest_check[c])]
+inf_cols = [c for c in feature_cols if not pd.isna(latest_check[c]) and abs(latest_check[c]) == float('inf')]
+if nan_cols:
+    print(json.dumps({{"error": f"NaN in latest row for features: {{nan_cols}}"}}))
+    sys.exit(1)
+if inf_cols:
+    print(json.dumps({{"error": f"inf in latest row for features: {{inf_cols}}"}}))
     sys.exit(1)
 
 latest = df.iloc[[-1]]

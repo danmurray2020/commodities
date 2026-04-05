@@ -18,6 +18,11 @@ echo "[$DATE] Starting weekly pipeline..." >> "$LOG_DIR/cron.log"
 WEEKLY_OUTPUT=$(python3 -m agents weekly 2>&1)
 echo "$WEEKLY_OUTPUT" > "$LOG_DIR/weekly_${DATE}.txt"
 
+# === MODEL QUALITY ===
+# Diagnose model issues and retrain with per-commodity configs
+QUALITY_OUTPUT=$(python3 -m agents quality 2>&1)
+echo "$QUALITY_OUTPUT" >> "$LOG_DIR/weekly_${DATE}.txt"
+
 # === WEEKLY ANALYSIS ===
 # Research baselines + regime + alpha decay + backtests + risk + compliance
 ANALYSIS=$(
@@ -30,6 +35,10 @@ ANALYSIS=$(
   python3 -m agents pnl --scenarios 2>&1
   python3 -m agents compliance 2>&1
   python3 -m agents infra 2>&1
+  python3 -m agents baselines 2>&1
+  python3 -m agents calibration 2>&1
+  python3 -m agents drift 2>&1
+  python3 -m agents data-quality 2>&1
 )
 echo "$ANALYSIS" >> "$LOG_DIR/weekly_${DATE}.txt"
 
@@ -50,11 +59,18 @@ Keep under 2000 characters." \
 === WEEKLY PIPELINE ===
 $WEEKLY_OUTPUT
 
+=== MODEL QUALITY ===
+$QUALITY_OUTPUT
+
 === ANALYSIS ===
 $ANALYSIS
 
 === DATABASE ===
 $DB_OUTPUT
 EOF
+
+# === CLAUDE WEEKLY REVIEW ===
+# Meta-agent reviews everything and sends Slack report
+"$REPO_DIR/scripts/claude_weekly_review.sh" || true
 
 echo "[$DATE] Weekly pipeline complete" >> "$LOG_DIR/cron.log"

@@ -21,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .config import COMMODITIES, CommodityConfig, COMMODITIES_DIR
+from .design_log import log_observation, log_challenge
 from .validation import check_model_files, check_fold_variance
 from .log import setup_logging, log_event
 
@@ -141,6 +142,26 @@ def retrain_commodity(cfg: CommodityConfig, dry_run: bool = False) -> dict:
 
     report["status"] = "ok"
     logger.info(f"{cfg.name}: reg_acc={new.get('reg_accuracy', '?')}, clf_acc={new.get('clf_accuracy', '?')}")
+
+    # Log observations to design log
+    reg_acc = new.get("reg_accuracy")
+    clf_acc = new.get("clf_accuracy")
+    if reg_acc is not None:
+        log_observation("training", f"Retrained — reg_acc={reg_acc:.2%}, clf_acc={clf_acc:.2%}", cfg.name)
+
+    # Challenge assumptions if performance is poor
+    for model_type, stats in variance.items():
+        if isinstance(stats, dict):
+            if stats.get("suspicious"):
+                log_challenge("training", "Walk-forward CV stability",
+                    f"{cfg.name} {model_type}: fold std={stats['std']:.2%}, "
+                    f"range={stats['range']:.2%}. High variance suggests "
+                    f"regime changes or overfitting.", cfg.name)
+            if reg_acc is not None and reg_acc < 0.55:
+                log_challenge("training", "Model predictive edge",
+                    f"{cfg.name} regression direction accuracy is {reg_acc:.2%} "
+                    f"(near random). Consider alternative approaches: "
+                    f"shorter horizon, different features, or ensemble methods.", cfg.name)
 
     return report
 

@@ -1,12 +1,16 @@
 """Trading strategy backtester with entry/exit rules, position sizing, and risk metrics."""
 
 import json
+import sys
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from dataclasses import dataclass, field
 from pathlib import Path
 from xgboost import XGBRegressor, XGBClassifier
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from agents.kelly import compute_kelly_size
 
 from features import prepare_dataset
 from train import walk_forward_split
@@ -60,25 +64,6 @@ class Trade:
     pnl_pct: float = 0.0
     hold_days: int = 0
     position_size: float = 1.0
-
-
-def compute_kelly_size(win_rate: float, avg_win: float, avg_loss: float, fraction: float = 0.5) -> float:
-    """Compute fractional Kelly criterion position size.
-
-    Kelly f* = (p * b - q) / b
-    where p = win_rate, q = 1 - p, b = avg_win / abs(avg_loss)
-
-    Args:
-        avg_win: Mean profit on winning trades (positive).
-        avg_loss: Mean loss on losing trades (can be negative or positive;
-                  absolute value is used).
-    """
-    if avg_loss == 0 or win_rate <= 0 or avg_win <= 0:
-        return 0.0
-    b = avg_win / abs(avg_loss)
-    q = 1 - win_rate
-    kelly = (win_rate * b - q) / b
-    return max(0, min(kelly * fraction, 1.0))
 
 
 def run_strategy_backtest(config: TradeConfig = None):

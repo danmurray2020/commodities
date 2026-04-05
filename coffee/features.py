@@ -1,6 +1,10 @@
 """Feature engineering for coffee price prediction."""
 
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from agents.regime_features import add_regime_features
 
 import pandas as pd
 import numpy as np
@@ -219,6 +223,7 @@ def prepare_dataset(
 
     # Add technical features
     df = add_price_features(df)
+    df = add_regime_features(df, price_col="coffee_close")
 
     # Add fundamental data
     if use_cot:

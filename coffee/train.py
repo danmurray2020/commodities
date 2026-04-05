@@ -1,226 +1,305 @@
 """Train and evaluate coffee price prediction models."""
 
 import json
+import sys
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score
+from sklearn.inspection import permutation_importance
 from xgboost import XGBRegressor, XGBClassifier
+import optuna
 import joblib
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from agents.train_utils import (
+    walk_forward_split, evaluate_predictions, evaluate_classification,
+    filter_stable_features, reg_objective_spearman, clf_objective_spearman,
+)
 
 from features import prepare_dataset
 
-
 MODELS_DIR = Path(__file__).parent / "models"
+import os
+HORIZON = int(os.environ.get("QUALITY_HORIZON", "63"))
+OPTUNA_TRIALS = int(os.environ.get("QUALITY_OPTUNA_TRIALS", "200"))
+TEST_SIZE = int(os.environ.get("QUALITY_TEST_SIZE", "252"))
+N_SPLITS = int(os.environ.get("QUALITY_N_SPLITS", "5"))
+MIN_GAMMA = float(os.environ.get("QUALITY_MIN_GAMMA", "0.0"))
+MIN_REG_ALPHA = float(os.environ.get("QUALITY_MIN_REG_ALPHA", "1e-8"))
+MIN_REG_LAMBDA = float(os.environ.get("QUALITY_MIN_REG_LAMBDA", "1e-8"))
+MAX_DEPTH_MIN = int(os.environ.get("QUALITY_MAX_DEPTH_MIN", "2"))
+MAX_DEPTH_MAX = int(os.environ.get("QUALITY_MAX_DEPTH_MAX", "10"))
 
 
-def walk_forward_split(
-    df: pd.DataFrame,
-    n_splits: int = 5,
-    test_size: int = 63,  # ~3 months of trading days
-    min_train_size: int = 504,  # ~2 years
-    purge_gap: int = 5,  # gap between train and test to prevent label leakage
-) -> list[tuple[np.ndarray, np.ndarray]]:
-    """Generate walk-forward (expanding window) train/test indices.
-
-    Args:
-        df: Full dataset (must be time-sorted).
-        n_splits: Number of CV folds.
-        test_size: Number of rows in each test fold.
-        min_train_size: Minimum rows in the training set.
-        purge_gap: Number of rows to skip between train and test sets.
-            Should equal the prediction horizon to prevent label leakage.
-
-    Returns:
-        List of (train_indices, test_indices) tuples.
-    """
-    n = len(df)
-    splits = []
-    for i in range(n_splits):
-        test_end = n - i * test_size
-        test_start = test_end - test_size
-        train_end = test_start - purge_gap  # purge gap prevents label leakage
-        if train_end < min_train_size:
-            break
-        train_idx = np.arange(0, train_end)
-        test_idx = np.arange(test_start, test_end)
-        splits.append((train_idx, test_idx))
-    splits.reverse()  # chronological order
-    return splits
-
-
-def train_regression_model(
-    df: pd.DataFrame,
-    feature_cols: list[str],
-    target_col: str = "target_return",
-) -> dict:
-    """Train an XGBoost regressor with walk-forward CV.
-
-    Returns:
-        Dict with model, metrics, and feature importances.
-    """
+def select_features(df, feature_cols, splits):
+    """Permutation importance feature selection."""
     X = df[feature_cols].values
-    y = df[target_col].values
-    splits = walk_forward_split(df, purge_gap=5)
-
-    fold_metrics = []
-    models = []
+    y = df["target_direction"].values
+    all_importances = np.zeros((len(splits), len(feature_cols)))
 
     for fold_i, (train_idx, test_idx) in enumerate(splits):
-        X_train, X_test = X[train_idx], X[test_idx]
-        y_train, y_test = y[train_idx], y[test_idx]
-
-        model = XGBRegressor(
-            n_estimators=300,
-            max_depth=5,
-            learning_rate=0.05,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            early_stopping_rounds=20,
-            random_state=42,
-        )
-        val_size = min(63, len(X_train) // 5)
-        X_fit, X_val = X_train[:-val_size], X_train[-val_size:]
-        y_fit, y_val = y_train[:-val_size], y_train[-val_size:]
-        model.fit(
-            X_fit, y_fit,
-            eval_set=[(X_val, y_val)],
-            verbose=False,
-        )
-        preds = model.predict(X_test)
-
-        rmse = np.sqrt(mean_squared_error(y_test, preds))
-        mae = mean_absolute_error(y_test, preds)
-        direction_acc = np.mean((preds > 0) == (y_test > 0))
-
-        fold_metrics.append({"fold": fold_i, "rmse": rmse, "mae": mae, "direction_acc": direction_acc})
-        models.append(model)
-        print(f"  Fold {fold_i}: RMSE={rmse:.6f}, MAE={mae:.6f}, Direction Acc={direction_acc:.2%}")
-
-    # Select the model from the fold with best direction accuracy
-    best_fold_idx = int(np.argmax([m["direction_acc"] for m in fold_metrics]))
-    best_model = models[best_fold_idx]
-    print(f"  Selected model from fold {best_fold_idx} (best direction_acc={fold_metrics[best_fold_idx]['direction_acc']:.2%})")
-
-    # Feature importance
-    importances = dict(zip(feature_cols, best_model.feature_importances_.tolist()))
-    importances = dict(sorted(importances.items(), key=lambda x: x[1], reverse=True))
-
-    avg_metrics = {
-        "avg_rmse": np.mean([m["rmse"] for m in fold_metrics]),
-        "avg_mae": np.mean([m["mae"] for m in fold_metrics]),
-        "avg_direction_acc": np.mean([m["direction_acc"] for m in fold_metrics]),
-    }
-    print(f"\n  Average: RMSE={avg_metrics['avg_rmse']:.6f}, "
-          f"Direction Acc={avg_metrics['avg_direction_acc']:.2%}")
-
-    return {
-        "model": best_model,
-        "fold_metrics": fold_metrics,
-        "avg_metrics": avg_metrics,
-        "feature_importances": importances,
-    }
-
-
-def train_classification_model(
-    df: pd.DataFrame,
-    feature_cols: list[str],
-    target_col: str = "target_direction",
-) -> dict:
-    """Train an XGBoost classifier for direction prediction with walk-forward CV.
-
-    Returns:
-        Dict with model, metrics, and feature importances.
-    """
-    X = df[feature_cols].values
-    y = df[target_col].values
-    splits = walk_forward_split(df, purge_gap=5)
-
-    fold_metrics = []
-    models = []
-
-    for fold_i, (train_idx, test_idx) in enumerate(splits):
-        X_train, X_test = X[train_idx], X[test_idx]
-        y_train, y_test = y[train_idx], y[test_idx]
-
+        print(f"  Feature selection fold {fold_i}...")
+        val_size = min(63, len(train_idx) // 5)
+        fit_idx, val_idx = train_idx[:-val_size], train_idx[-val_size:]
+        neg = np.sum(y[fit_idx] == 0)
+        pos = np.sum(y[fit_idx] == 1)
+        spw = neg / pos if pos > 0 else 1.0
         model = XGBClassifier(
-            n_estimators=300,
-            max_depth=4,
-            learning_rate=0.05,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            early_stopping_rounds=20,
-            random_state=42,
-            use_label_encoder=False,
-            eval_metric="logloss",
+            n_estimators=300, max_depth=6, learning_rate=0.1,
+            subsample=0.8, colsample_bytree=0.6,
+            min_child_weight=10, gamma=1.0,
+            scale_pos_weight=spw,
+            eval_metric="logloss", early_stopping_rounds=30, random_state=42,
         )
-        val_size = min(63, len(X_train) // 5)
-        X_fit, X_val = X_train[:-val_size], X_train[-val_size:]
-        y_fit, y_val = y_train[:-val_size], y_train[-val_size:]
-        model.fit(
-            X_fit, y_fit,
-            eval_set=[(X_val, y_val)],
-            verbose=False,
+        model.fit(X[fit_idx], y[fit_idx],
+                  eval_set=[(X[val_idx], y[val_idx])], verbose=False)
+        result = permutation_importance(
+            model, X[test_idx], y[test_idx],
+            n_repeats=10, random_state=42, scoring="accuracy",
         )
-        preds = model.predict(X_test)
-        acc = accuracy_score(y_test, preds)
+        all_importances[fold_i] = result.importances_mean
 
-        fold_metrics.append({"fold": fold_i, "accuracy": acc})
-        models.append(model)
-        print(f"  Fold {fold_i}: Accuracy={acc:.2%}")
+    mean_imp = all_importances.mean(axis=0)
+    ranking = sorted(zip(feature_cols, mean_imp), key=lambda x: x[1], reverse=True)
+    selected = [f for f, imp in ranking if imp > 0]
+    if len(selected) < 3:
+        # Fallback: keep top 10 features by importance if selection is too aggressive
+        selected = [f for f, _ in ranking[:max(10, len(ranking) // 4)]]
+        print(f"  Warning: only {len([f for f, imp in ranking if imp > 0])} features had positive importance. Using top {len(selected)} instead.")
 
-    best_fold_idx = int(np.argmax([m["accuracy"] for m in fold_metrics]))
-    best_model = models[best_fold_idx]
-    print(f"  Selected model from fold {best_fold_idx} (best accuracy={fold_metrics[best_fold_idx]['accuracy']:.2%})")
-    importances = dict(zip(feature_cols, best_model.feature_importances_.tolist()))
-    importances = dict(sorted(importances.items(), key=lambda x: x[1], reverse=True))
-
-    avg_acc = np.mean([m["accuracy"] for m in fold_metrics])
-    print(f"\n  Average Accuracy: {avg_acc:.2%}")
-
-    return {
-        "model": best_model,
-        "fold_metrics": fold_metrics,
-        "avg_accuracy": avg_acc,
-        "feature_importances": importances,
-    }
+    print(f"\n  Selected {len(selected)} features (from {len(feature_cols)}):")
+    for f, imp in ranking[:20]:
+        marker = " *" if imp > 0 else ""
+        print(f"    {f:<40} {imp:.4f}{marker}")
+    return selected
 
 
 def main():
     MODELS_DIR.mkdir(exist_ok=True)
 
-    print("Preparing dataset...")
-    df, feature_cols = prepare_dataset(horizon=5)
-    print(f"Dataset: {len(df)} rows, {len(feature_cols)} features\n")
+    print("=" * 60)
+    print("COFFEE FUTURES PREDICTION MODEL")
+    print("=" * 60)
 
-    # Train regression model (predict return magnitude)
-    print("Training regression model (predict 5-day return)...")
-    reg_results = train_regression_model(df, feature_cols)
+    print("\nPreparing dataset...")
+    df, all_feature_cols = prepare_dataset(horizon=HORIZON)
 
-    # Train classification model (predict direction)
-    print("\nTraining classification model (predict 5-day direction)...")
-    clf_results = train_classification_model(df, feature_cols)
+    # Separate CV for feature selection (excludes last 2 folds to prevent leakage)
+    selection_splits = walk_forward_split(df, n_splits=3, purge_gap=HORIZON)
+    print(f"Dataset: {len(df)} rows, {len(all_feature_cols)} features")
+    print(f"Feature selection: {len(selection_splits)} folds (separate from training)\n")
 
-    # Save models
-    joblib.dump(reg_results["model"], MODELS_DIR / "xgb_regressor.joblib")
-    joblib.dump(clf_results["model"], MODELS_DIR / "xgb_classifier.joblib")
+    # Feature selection on separate folds
+    print("Running feature selection...")
+    selected = select_features(df, all_feature_cols, selection_splits)
 
-    # Save feature list and metrics
-    metadata = {
-        "feature_cols": feature_cols,
-        "horizon": 5,
-        "regression_metrics": reg_results["avg_metrics"],
-        "classification_accuracy": clf_results["avg_accuracy"],
-        "top_features_regression": dict(list(reg_results["feature_importances"].items())[:15]),
-        "top_features_classification": dict(list(clf_results["feature_importances"].items())[:15]),
+    # Filter unstable features
+    print("\nFiltering for feature stability...")
+    stable_features, stability_diag = filter_stable_features(df, selected)
+    n_dropped = len(selected) - len(stable_features)
+    if n_dropped > 0:
+        dropped = [d["feature"] for d in stability_diag if not d["stable"]]
+        print(f"  Dropped {n_dropped} unstable features: {dropped[:10]}")
+    if len(stable_features) >= 3:
+        feature_cols = stable_features
+    else:
+        print("  Warning: too few stable features, using all selected features")
+        feature_cols = selected
+
+    # Training/evaluation uses full 5-fold CV
+    splits = walk_forward_split(df, n_splits=N_SPLITS, test_size=TEST_SIZE, purge_gap=HORIZON)
+    print(f"Training: {len(splits)} folds (full walk-forward CV)")
+    X = df[feature_cols].values
+    y_ret = df["target_return"].values
+    y_dir = df["target_direction"].values
+
+    # Optuna tuning
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+    print(f"\nTuning regression model (200 trials)...")
+    reg_study = optuna.create_study(direction="maximize", study_name="coffee_reg")
+    reg_study.optimize(lambda t: reg_objective_spearman(t, X, y_ret, splits, horizon=HORIZON), n_trials=OPTUNA_TRIALS)
+    print(f"Best regression score: {reg_study.best_value:.4f}")
+
+    print(f"\nTuning classification model (200 trials)...")
+    clf_study = optuna.create_study(direction="maximize", study_name="coffee_clf")
+    clf_study.optimize(lambda t: clf_objective_spearman(t, X, y_dir, splits, horizon=HORIZON), n_trials=OPTUNA_TRIALS)
+    print(f"Best classification score: {clf_study.best_value:.4f}")
+
+    # Evaluate
+    print("\n" + "=" * 60)
+    print("EVALUATION (purged walk-forward CV)")
+    print("=" * 60)
+    reg_params = {**reg_study.best_params, "early_stopping_rounds": 30, "random_state": 42}
+    clf_params = {**clf_study.best_params, "eval_metric": "logloss",
+                  "early_stopping_rounds": 30, "random_state": 42}
+
+    # Apply quality agent regularization floors
+    reg_params["gamma"] = max(reg_params.get("gamma", 0), MIN_GAMMA)
+    reg_params["reg_alpha"] = max(reg_params.get("reg_alpha", 0), MIN_REG_ALPHA)
+    reg_params["reg_lambda"] = max(reg_params.get("reg_lambda", 0), MIN_REG_LAMBDA)
+    reg_params["max_depth"] = min(reg_params.get("max_depth", 10), MAX_DEPTH_MAX)
+    clf_params["gamma"] = max(clf_params.get("gamma", 0), MIN_GAMMA)
+    clf_params["reg_alpha"] = max(clf_params.get("reg_alpha", 0), MIN_REG_ALPHA)
+    clf_params["reg_lambda"] = max(clf_params.get("reg_lambda", 0), MIN_REG_LAMBDA)
+    clf_params["max_depth"] = min(clf_params.get("max_depth", 10), MAX_DEPTH_MAX)
+
+    reg_fold_spearman = []
+    reg_fold_dir_acc = []
+    reg_fold_maes = []
+    reg_fold_rmses = []
+    clf_fold_acc_ind = []
+    for fold_i, (train_idx, test_idx) in enumerate(splits):
+        val_size = min(63, len(train_idx) // 5)
+        fit_idx, val_idx = train_idx[:-val_size], train_idx[-val_size:]
+
+        reg = XGBRegressor(**reg_params)
+        reg.fit(X[fit_idx], y_ret[fit_idx],
+                eval_set=[(X[val_idx], y_ret[val_idx])], verbose=False)
+        reg_preds = reg.predict(X[test_idx])
+        reg_metrics = evaluate_predictions(y_ret[test_idx], reg_preds, horizon=HORIZON)
+        reg_fold_spearman.append(reg_metrics["spearman"])
+        reg_fold_dir_acc.append(reg_metrics["dir_acc_independent"])
+        reg_fold_maes.append(reg_metrics["mae"])
+        reg_fold_rmses.append(reg_metrics["rmse"])
+
+        neg = np.sum(y_dir[fit_idx] == 0)
+        pos = np.sum(y_dir[fit_idx] == 1)
+        spw = neg / pos if pos > 0 else 1.0
+        clf = XGBClassifier(**clf_params, scale_pos_weight=spw)
+        clf.fit(X[fit_idx], y_dir[fit_idx],
+                eval_set=[(X[val_idx], y_dir[val_idx])], verbose=False)
+        clf_metrics = evaluate_classification(y_dir[test_idx], clf.predict(X[test_idx]), horizon=HORIZON)
+        clf_fold_acc_ind.append(clf_metrics["acc_independent"])
+        print(f"  Fold {fold_i}: Reg Spearman={reg_metrics['spearman']:.4f} DirAcc={reg_metrics['dir_acc_independent']:.2%} MAE={reg_metrics['mae']:.4f}, Clf={clf_metrics['acc_independent']:.2%}")
+
+    print(f"\n  REGRESSION  — Spearman: {np.mean(reg_fold_spearman):.4f}, DirAcc: {np.mean(reg_fold_dir_acc):.2%}, MAE: {np.mean(reg_fold_maes):.4f}, RMSE: {np.mean(reg_fold_rmses):.4f}")
+    print(f"  CLASSIFIER  — Acc(ind): {np.mean(clf_fold_acc_ind):.2%}, Std: {np.std(clf_fold_acc_ind):.2%}")
+
+    # Train final models
+    last_train, last_test = splits[-1]
+    val_size = min(63, len(last_train) // 5)
+    fit_idx, val_idx = last_train[:-val_size], last_train[-val_size:]
+    final_reg = XGBRegressor(**reg_params)
+    final_reg.fit(X[fit_idx], y_ret[fit_idx],
+                  eval_set=[(X[val_idx], y_ret[val_idx])], verbose=False)
+    neg = np.sum(y_dir[fit_idx] == 0)
+    pos = np.sum(y_dir[fit_idx] == 1)
+    spw = neg / pos if pos > 0 else 1.0
+    final_clf = XGBClassifier(**clf_params, scale_pos_weight=spw)
+    final_clf.fit(X[fit_idx], y_dir[fit_idx],
+                  eval_set=[(X[val_idx], y_dir[val_idx])], verbose=False)
+
+    # Held-out evaluation (last 126 rows never seen during CV)
+    holdout_size = 126
+    if len(df) > holdout_size + 504:
+        holdout_idx = np.arange(len(df) - holdout_size, len(df))
+        X_holdout = X[holdout_idx]
+        y_ret_holdout = y_ret[holdout_idx]
+        y_dir_holdout = y_dir[holdout_idx]
+
+        holdout_reg_preds = final_reg.predict(X_holdout)
+        holdout_reg_metrics = evaluate_predictions(y_ret_holdout, holdout_reg_preds, horizon=HORIZON)
+        holdout_reg_acc = holdout_reg_metrics["dir_acc_independent"]
+        holdout_reg_spearman = holdout_reg_metrics["spearman"]
+        holdout_reg_mae = holdout_reg_metrics["mae"]
+
+        holdout_clf_preds = final_clf.predict(X_holdout)
+        holdout_clf_metrics = evaluate_classification(y_dir_holdout, holdout_clf_preds, horizon=HORIZON)
+        holdout_clf_acc = holdout_clf_metrics["acc_independent"]
+
+        print(f"\n  HELD-OUT TEST ({holdout_size} days, never seen during CV):")
+        print(f"    Regression Spearman: {holdout_reg_spearman:.4f}, DirAcc: {holdout_reg_acc:.2%}, MAE: {holdout_reg_mae:.4f}")
+        print(f"    Classification(ind): {holdout_clf_acc:.2%}")
+    else:
+        holdout_reg_acc = None
+        holdout_clf_acc = None
+        holdout_reg_mae = None
+        holdout_reg_spearman = None
+        print("\n  HELD-OUT TEST: Skipped (insufficient data)")
+
+    joblib.dump(final_reg, MODELS_DIR / "production_regressor.joblib")
+    joblib.dump(final_clf, MODELS_DIR / "production_classifier.joblib")
+
+    strategy_config = {
+        "confidence_threshold": 0.75, "stop_loss_pct": 0.10,
+        "take_profit_multiplier": 1.0, "max_hold_days": 63,
+        "allow_short": True,
     }
-    with open(MODELS_DIR / "metadata.json", "w") as f:
+
+    metadata = {
+        "commodity": "coffee",
+        "ticker": "KC=F",
+        "horizon": HORIZON,
+        "features": feature_cols,
+        "n_features": len(feature_cols),
+        "purge_gap": HORIZON,
+        "strategy": strategy_config,
+        "regression": {
+            "params": reg_study.best_params,
+            "fold_spearman": reg_fold_spearman,
+            "avg_spearman": float(np.mean(reg_fold_spearman)),
+            "fold_dir_acc_independent": reg_fold_dir_acc,
+            "avg_dir_acc_independent": float(np.mean(reg_fold_dir_acc)),
+            "fold_accuracies": reg_fold_dir_acc,  # backward compat
+            "avg_accuracy": float(np.mean(reg_fold_dir_acc)),  # backward compat
+            "std_accuracy": float(np.std(reg_fold_dir_acc)),
+            "fold_maes": reg_fold_maes,
+            "fold_rmses": reg_fold_rmses,
+            "avg_mae": float(np.mean(reg_fold_maes)),
+            "avg_rmse": float(np.mean(reg_fold_rmses)),
+        },
+        "classification": {
+            "params": clf_study.best_params,
+            "fold_acc_independent": clf_fold_acc_ind,
+            "avg_acc_independent": float(np.mean(clf_fold_acc_ind)),
+            "fold_accuracies": clf_fold_acc_ind,  # backward compat
+            "avg_accuracy": float(np.mean(clf_fold_acc_ind)),  # backward compat
+            "std_accuracy": float(np.std(clf_fold_acc_ind)),
+        },
+        "holdout": {
+            "size": holdout_size if len(df) > holdout_size + 504 else 0,
+            "reg_direction_accuracy": holdout_reg_acc,
+            "reg_spearman": holdout_reg_spearman,
+            "reg_mae": holdout_reg_mae,
+            "clf_accuracy": holdout_clf_acc,
+        },
+    }
+    with open(MODELS_DIR / "production_metadata.json", "w") as f:
         json.dump(metadata, f, indent=2, default=str)
 
+    # Prediction
+    print("\n" + "=" * 60)
+    print("COFFEE 63-DAY PREDICTION")
+    print("=" * 60)
+    latest = df.iloc[[-1]]
+    X_latest = latest[feature_cols].values
+    pred_return = float(final_reg.predict(X_latest)[0])
+    pred_dir = int(final_clf.predict(X_latest)[0])
+    pred_proba = final_clf.predict_proba(X_latest)[0]
+    confidence = float(pred_proba[pred_dir])
+    current_price = float(latest["coffee_close"].values[0])
+    predicted_price = current_price * (1 + pred_return)
+
+    print(f"Date: {latest.index[0].strftime('%Y-%m-%d')}")
+    print(f"Current price: ${current_price:.2f}")
+    print(f"Predicted 63-day return: {pred_return:+.2%}")
+    print(f"Predicted price: ${predicted_price:.2f}")
+    print(f"Direction: {'UP' if pred_dir == 1 else 'DOWN'} (confidence: {confidence:.1%})")
+
+    if confidence >= strategy_config["confidence_threshold"]:
+        direction = "LONG" if pred_dir == 1 else "SHORT"
+        tp = abs(pred_return)
+        sl = strategy_config["stop_loss_pct"]
+        tp_price = current_price * (1 + tp) if direction == "LONG" else current_price * (1 - tp)
+        sl_price = current_price * (1 - sl) if direction == "LONG" else current_price * (1 + sl)
+        print(f"\nStrategy: {direction}")
+        print(f"  Entry: ${current_price:.2f}, TP: ${tp_price:.2f}, SL: ${sl_price:.2f}")
+    else:
+        print(f"\nStrategy: NO TRADE (confidence {confidence:.1%} < 75%)")
+
     print(f"\nModels saved to {MODELS_DIR}/")
-    print(f"Top 10 features (regression):")
-    for feat, imp in list(reg_results["feature_importances"].items())[:10]:
-        print(f"  {feat}: {imp:.4f}")
 
 
 if __name__ == "__main__":

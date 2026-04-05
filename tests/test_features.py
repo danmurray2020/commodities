@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # Add sugar project to path so we can import features
-sys.path.insert(0, str(Path("/Users/danielmurray/dev2/sugar")))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "sugar"))
 from features import add_price_features, build_target
 
 

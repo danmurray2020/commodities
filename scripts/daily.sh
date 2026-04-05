@@ -24,8 +24,10 @@ OUTPUT=$(
 )
 
 # === DAILY OVERSIGHT ===
-# Risk check + regime check + infrastructure health
+# Data quality + risk + regime + drift + infrastructure health
 OVERSIGHT=$(
+  python3 -m agents data-quality 2>&1
+  python3 -m agents drift 2>&1
   python3 -m agents risk --var 2>&1
   python3 -m agents regime --alert 2>&1
   python3 -m agents infra 2>&1

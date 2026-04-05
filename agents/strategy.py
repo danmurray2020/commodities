@@ -20,20 +20,11 @@ import numpy as np
 from .config import (
     COMMODITIES, CORRELATION_GROUPS, SIZING, TRADE_DEFAULTS, COMMODITIES_DIR,
 )
+from .kelly import compute_kelly_size
 from .log import setup_logging
 
 
 logger = setup_logging("strategy")
-
-
-def compute_kelly_size(win_rate: float, avg_win: float, avg_loss: float) -> float:
-    """Compute fractional Kelly criterion position size."""
-    if avg_loss == 0 or win_rate <= 0 or avg_win <= 0:
-        return 0.0
-    b = avg_win / abs(avg_loss)
-    q = 1 - win_rate
-    kelly = (win_rate * b - q) / b
-    return max(0.0, kelly * SIZING.kelly_fraction)
 
 
 def get_base_size(confidence: float) -> float:

@@ -41,7 +41,7 @@ df = df.ffill()
 df = df.dropna()
 
 models_dir = 'models'
-for meta_file in ['v2_production_metadata.json', 'production_metadata.json']:
+for meta_file in ['ensemble_metadata.json', 'v2_production_metadata.json', 'production_metadata.json']:
     try:
         with open(f'{{models_dir}}/{{meta_file}}') as f:
             meta = json.load(f)

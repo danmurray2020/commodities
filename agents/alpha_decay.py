@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 
 from .config import COMMODITIES, CommodityConfig, LOGS_DIR
+from .design_log import log_observation, log_challenge
 from .log import setup_logging, log_event
 
 # DB access (optional — gracefully degrade if unavailable)

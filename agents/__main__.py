@@ -16,6 +16,10 @@ Usage:
     python -m agents compliance                   # Compliance Agent
     python -m agents infra                        # Infrastructure Agent
     python -m agents pnl                          # P&L Forecast Agent
+    python -m agents drift [commodities...]       # Feature Drift Agent
+    python -m agents data-quality [commodities...]  # Data Quality Agent (validate data)
+    python -m agents quality [commodities...]     # Model Quality Agent (diagnose + fix)
+    python -m agents baselines [commodities...]   # Baseline Benchmark Agent
     python -m agents weekly [commodities...]      # Full weekly pipeline
     python -m agents health                       # Quick health check
 """
@@ -76,6 +80,21 @@ def main():
         run()
     elif command in ("pnl", "forecast"):
         from .pnl_forecast import main as run
+        run()
+    elif command == "drift":
+        from .feature_drift import main as run
+        run()
+    elif command == "data-quality":
+        from .data_quality import main as run
+        run()
+    elif command == "quality":
+        from .model_quality import main as run
+        run()
+    elif command == "baselines":
+        from .baselines import main as run
+        run()
+    elif command == "calibration":
+        from .calibration import main as run
         run()
     elif command in ("weekly", "run"):
         from .orchestrator import main as run
