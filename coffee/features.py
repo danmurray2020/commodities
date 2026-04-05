@@ -232,6 +232,7 @@ def prepare_dataset(
     df = build_target(df, horizon=horizon)
 
     # Drop rows with NaNs from rolling calculations
+    df = df.ffill()
     df = df.dropna()
 
     # Identify feature columns (everything except targets and raw prices)

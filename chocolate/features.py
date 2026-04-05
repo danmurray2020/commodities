@@ -172,6 +172,7 @@ def prepare_dataset(
     if use_enso:
         df = merge_enso_data(df)
     df = build_target(df, horizon=horizon)
+    df = df.ffill()
     df = df.dropna()
 
     exclude = {"cocoa_close", "Open", "High", "Low", "Volume", "target_return", "target_direction"}

@@ -36,6 +36,8 @@ df = add_price_features(df)
 df = merge_cot_data(df)
 df = merge_weather_data(df)
 df = merge_enso_data(df)
+# Forward-fill remaining NaN (ENSO monthly data may lag) then drop only rows still missing
+df = df.ffill()
 df = df.dropna()
 
 models_dir = 'models'

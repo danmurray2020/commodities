@@ -52,6 +52,7 @@ df = add_price_features(df)
 df = merge_cot_data(df)
 df = merge_weather_data(df)
 df = merge_enso_data(df)
+df = df.ffill()
 df = df.dropna()
 
 with open('models/production_metadata.json') as f:

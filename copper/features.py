@@ -125,6 +125,7 @@ def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63
     if use_weather: df = merge_weather_data(df)
     if use_enso: df = merge_enso_data(df)
     df = build_target(df, horizon=horizon)
+    df = df.ffill()
     df = df.dropna()
     exclude = {"copper_close", "Open", "High", "Low", "Volume", "target_return", "target_direction"}
     feature_cols = [c for c in df.columns if c not in exclude]
