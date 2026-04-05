@@ -1,0 +1,85 @@
+{
+  "version": "v5",
+  "commodity": "Sugar",
+  "ticker": "SB=F",
+  "horizon": 42,
+  "features": [
+    "india_precip_7d_sum",
+    "trend_slope_21d",
+    "mei",
+    "brazil_precip_30d_sum",
+    "cocoa",
+    "cot_comm_long",
+    "season_cos_2",
+    "cot_oi_change",
+    "season_cos",
+    "return_5d",
+    "volatility_63d",
+    "volatility_21d",
+    "macd",
+    "brl_vs_sma50",
+    "brazil_temp_7d_avg",
+    "brazil_avg_temp",
+    "brazil_precip_7d_sum",
+    "brazil_temp_anomaly",
+    "inr_vs_sma50",
+    "sma_50_200_gap",
+    "sma_10",
+    "price_lag_3",
+    "india_avg_temp",
+    "return_21d",
+    "trend_slope_126d",
+    "india_precip_30d_sum",
+    "cot_noncomm_short_chg"
+  ],
+  "n_features": 27,
+  "purge_gap": 42,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 42,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 372,
+      "max_depth": 5,
+      "learning_rate": 0.11144067367335603,
+      "subsample": 0.7468347500231419,
+      "colsample_bytree": 0.35147633176314935,
+      "min_child_weight": 6,
+      "gamma": 3.303877393032164,
+      "reg_alpha": 0.09058912287149236,
+      "reg_lambda": 0.000995244608960547,
+      "scale_pos_weight": 0.6581109381569976,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.8412698412698413,
+      1.0,
+      0.7619047619047619,
+      0.8412698412698413,
+      0.8412698412698413
+    ],
+    "avg_accuracy": 0.8571428571428571,
+    "std_accuracy": 0.07776157913597392
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 372,
+      "max_depth": 5,
+      "learning_rate": 0.11144067367335603,
+      "subsample": 0.7468347500231419,
+      "colsample_bytree": 0.35147633176314935,
+      "min_child_weight": 6,
+      "gamma": 3.303877393032164,
+      "reg_alpha": 0.09058912287149236,
+      "reg_lambda": 0.000995244608960547,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "best_accuracy": 0.6285714285714286,
+  "best_params": {
+    "n_estimators": 477,
+    "max_depth": 8,
+    "learning_rate": 0.29811669662951557,
+    "subsample": 0.8099983603897367,
+    "colsample_bytree": 0.5325112392950402,
+    "min_child_weight": 16,
+    "gamma": 0.727669134149342,
+    "reg_alpha": 0.07390161783178863,
+    "reg_lambda": 0.0008852101377347418
+  },
+  "n_trials": 100
+}

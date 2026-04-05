@@ -1,0 +1,68 @@
+{
+  "commodity": "natgas",
+  "ticker": "NG=F",
+  "horizon": 63,
+  "features": [
+    "macd_diff",
+    "cot_comm_short",
+    "pct_up_days_63d",
+    "season_sin_1",
+    "cot_net_spec",
+    "mei"
+  ],
+  "n_features": 6,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 499,
+      "max_depth": 10,
+      "learning_rate": 0.23302816873524088,
+      "subsample": 0.5097877145282268,
+      "colsample_bytree": 0.45195709762961017,
+      "min_child_weight": 2,
+      "gamma": 0.43602508221970737,
+      "reg_alpha": 0.19668821298986938,
+      "reg_lambda": 5.834497928702959e-06,
+      "max_delta_step": 2.9350989999047106
+    },
+    "fold_accuracies": [
+      0.873015873015873,
+      0.7301587301587301,
+      0.6666666666666666,
+      0.7936507936507936,
+      0.7142857142857143
+    ],
+    "avg_accuracy": 0.7555555555555555,
+    "std_accuracy": 0.07141093256636187
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 282,
+      "max_depth": 5,
+      "learning_rate": 0.22759350193879468,
+      "subsample": 0.9382731179255662,
+      "colsample_bytree": 0.7770485279170435,
+      "min_child_weight": 5,
+      "gamma": 3.597143923731333,
+      "reg_alpha": 0.008275078216740698,
+      "reg_lambda": 2.048527521479802e-05,
+      "max_delta_step": 4.736932211329203
+    },
+    "fold_accuracies": [
+      1.0,
+      0.5555555555555556,
+      0.6666666666666666,
+      0.8571428571428571,
+      0.7142857142857143
+    ],
+    "avg_accuracy": 0.7587301587301588,
+    "std_accuracy": 0.15467844717561693
+  }
+}

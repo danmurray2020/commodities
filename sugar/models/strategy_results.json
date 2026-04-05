@@ -1,0 +1,123 @@
+{
+  "config": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "max_hold_days": 63,
+    "kelly_fraction": 0.5,
+    "allow_short": true,
+    "scale_in": false
+  },
+  "metrics": {
+    "total_trades": 9,
+    "win_rate": 0.8889,
+    "avg_win": 0.0488,
+    "avg_loss": -0.1039,
+    "profit_factor": 3.76,
+    "kelly_size": 0.3262,
+    "total_return": 0.3099,
+    "cagr": 0.0345,
+    "max_drawdown": 0.1039,
+    "sharpe": 0.65
+  },
+  "trades": [
+    {
+      "entry_date": "2024-02-01",
+      "exit_date": "2024-02-15",
+      "direction": "SHORT",
+      "entry_price": 23.56,
+      "exit_price": 22.82,
+      "pnl_pct": 0.0324,
+      "confidence": 0.803,
+      "hold_days": 10,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2024-02-16",
+      "exit_date": "2024-03-01",
+      "direction": "SHORT",
+      "entry_price": 23.08,
+      "exit_price": 21.09,
+      "pnl_pct": 0.0944,
+      "confidence": 0.7592,
+      "hold_days": 9,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2024-03-11",
+      "exit_date": "2024-04-11",
+      "direction": "SHORT",
+      "entry_price": 21.95,
+      "exit_price": 20.85,
+      "pnl_pct": 0.0528,
+      "confidence": 0.7593,
+      "hold_days": 22,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2025-01-07",
+      "exit_date": "2025-01-13",
+      "direction": "SHORT",
+      "entry_price": 19.45,
+      "exit_price": 18.9,
+      "pnl_pct": 0.0291,
+      "confidence": 0.7535,
+      "hold_days": 4,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2025-01-14",
+      "exit_date": "2025-01-21",
+      "direction": "SHORT",
+      "entry_price": 18.32,
+      "exit_price": 17.79,
+      "pnl_pct": 0.0298,
+      "confidence": 0.7535,
+      "hold_days": 4,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2025-01-28",
+      "exit_date": "2025-02-25",
+      "direction": "SHORT",
+      "entry_price": 19.23,
+      "exit_price": 21.46,
+      "pnl_pct": -0.1039,
+      "confidence": 0.7668,
+      "hold_days": 19,
+      "exit_reason": "stop_loss"
+    },
+    {
+      "entry_date": "2025-02-26",
+      "exit_date": "2025-02-27",
+      "direction": "SHORT",
+      "entry_price": 20.64,
+      "exit_price": 19.69,
+      "pnl_pct": 0.0482,
+      "confidence": 0.8486,
+      "hold_days": 1,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2025-02-28",
+      "exit_date": "2025-03-03",
+      "direction": "SHORT",
+      "entry_price": 19.51,
+      "exit_price": 18.22,
+      "pnl_pct": 0.0708,
+      "confidence": 0.7974,
+      "hold_days": 1,
+      "exit_reason": "take_profit"
+    },
+    {
+      "entry_date": "2025-03-04",
+      "exit_date": "2025-04-15",
+      "direction": "SHORT",
+      "entry_price": 18.1,
+      "exit_price": 17.52,
+      "pnl_pct": 0.0331,
+      "confidence": 0.7882,
+      "hold_days": 30,
+      "exit_reason": "take_profit"
+    }
+  ]
+}

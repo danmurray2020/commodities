@@ -1,0 +1,79 @@
+{
+  "version": "v5",
+  "commodity": "Copper",
+  "ticker": "HG=F",
+  "horizon": 126,
+  "features": [
+    "season_sin_1",
+    "price_lag_1",
+    "sma_5",
+    "month",
+    "price_lag_3",
+    "volatility_21d",
+    "price_lag_10",
+    "sma_10",
+    "usd_index",
+    "cot_noncomm_short",
+    "cot_noncomm_short_chg",
+    "price_lag_5",
+    "copper_oil_ratio",
+    "sma_50",
+    "cot_open_interest",
+    "cot_comm_short",
+    "sma_21",
+    "mei_change_3m",
+    "crude_oil",
+    "price_vs_sma_21",
+    "cot_oi_change"
+  ],
+  "n_features": 21,
+  "purge_gap": 126,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.15,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 126,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 162,
+      "max_depth": 4,
+      "learning_rate": 0.011643012592030258,
+      "subsample": 0.564513331674482,
+      "colsample_bytree": 0.9852667218466353,
+      "min_child_weight": 23,
+      "gamma": 4.619471166780954,
+      "reg_alpha": 6.9590502294201205e-06,
+      "reg_lambda": 1.2381446916551476e-08,
+      "scale_pos_weight": 3.520077865864104,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.9841269841269841,
+      0.9841269841269841,
+      0.9682539682539683,
+      1.0,
+      0.9841269841269841
+    ],
+    "avg_accuracy": 0.984126984126984,
+    "std_accuracy": 0.010038976698947235
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 162,
+      "max_depth": 4,
+      "learning_rate": 0.011643012592030258,
+      "subsample": 0.564513331674482,
+      "colsample_bytree": 0.9852667218466353,
+      "min_child_weight": 23,
+      "gamma": 4.619471166780954,
+      "reg_alpha": 6.9590502294201205e-06,
+      "reg_lambda": 1.2381446916551476e-08,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

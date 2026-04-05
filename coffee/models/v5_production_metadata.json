@@ -1,0 +1,75 @@
+{
+  "version": "v5",
+  "commodity": "Coffee",
+  "ticker": "KC=F",
+  "horizon": 126,
+  "features": [
+    "vietnam_temp_30d_avg",
+    "macd_signal",
+    "momentum_rank_252d",
+    "price_vs_sma_50",
+    "price_vs_sma_200",
+    "mei_change_3m",
+    "cot_noncomm_short",
+    "trend_slope_63d",
+    "cot_spec_ratio",
+    "zscore_126d",
+    "season_cos",
+    "zscore_252d_change_21d",
+    "cot_comm_net_pct_oi",
+    "arabica_robusta_spread_zscore",
+    "brazil_temp_7d_avg",
+    "trend_slope_126d",
+    "cot_oi_change"
+  ],
+  "n_features": 17,
+  "purge_gap": 126,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 126,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 306,
+      "max_depth": 6,
+      "learning_rate": 0.05566355551865506,
+      "subsample": 0.5572979424501766,
+      "colsample_bytree": 0.7679519803454863,
+      "min_child_weight": 18,
+      "gamma": 4.199359288646104,
+      "reg_alpha": 1.5146338598683827e-08,
+      "reg_lambda": 0.0009952307432071446,
+      "scale_pos_weight": 1.1457976382225585,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      1.0,
+      0.8253968253968254,
+      0.9523809523809523,
+      0.873015873015873,
+      0.6825396825396826
+    ],
+    "avg_accuracy": 0.8666666666666666,
+    "std_accuracy": 0.11024606574085928
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 306,
+      "max_depth": 6,
+      "learning_rate": 0.05566355551865506,
+      "subsample": 0.5572979424501766,
+      "colsample_bytree": 0.7679519803454863,
+      "min_child_weight": 18,
+      "gamma": 4.199359288646104,
+      "reg_alpha": 1.5146338598683827e-08,
+      "reg_lambda": 0.0009952307432071446,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

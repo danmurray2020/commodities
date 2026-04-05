@@ -1,0 +1,87 @@
+{
+  "version": "v3",
+  "commodity": "Cocoa",
+  "ticker": "CC=F",
+  "horizon": 63,
+  "features": [
+    "sma_50_200_gap",
+    "zscore_252d",
+    "price_vs_sma_50",
+    "sma_5",
+    "indonesia_precip_30d_sum",
+    "sugar",
+    "trend_slope_21d",
+    "macd_signal",
+    "price_lag_5",
+    "zscore_126d",
+    "price_vs_sma_10",
+    "sma_10",
+    "crude_oil",
+    "cot_net_comm",
+    "westafrica_total_precip",
+    "usd_index",
+    "momentum_rank_252d",
+    "price_vs_sma_5",
+    "westafrica_temp_30d_avg",
+    "season_sin_2",
+    "indonesia_temp_anomaly"
+  ],
+  "n_features": 21,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 540,
+      "max_depth": 7,
+      "learning_rate": 0.011164142445240688,
+      "subsample": 0.5325007498988934,
+      "colsample_bytree": 0.7827507133911238,
+      "min_child_weight": 5,
+      "gamma": 4.9013189848069985,
+      "reg_alpha": 1.7285040682585145e-08,
+      "reg_lambda": 4.622180497970426e-06,
+      "max_delta_step": 0.8707581646572113,
+      "scale_pos_weight": 0.5925481396429071,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.9682539682539683,
+      0.9523809523809523,
+      0.9206349206349206,
+      1.0,
+      0.9841269841269841
+    ],
+    "avg_accuracy": 0.965079365079365,
+    "std_accuracy": 0.02730896910172264
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 540,
+      "max_depth": 7,
+      "learning_rate": 0.011164142445240688,
+      "subsample": 0.5325007498988934,
+      "colsample_bytree": 0.7827507133911238,
+      "min_child_weight": 5,
+      "gamma": 4.9013189848069985,
+      "reg_alpha": 1.7285040682585145e-08,
+      "reg_lambda": 4.622180497970426e-06,
+      "max_delta_step": 0.8707581646572113,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.6190476190476191,
+      0.5238095238095238,
+      0.12698412698412698,
+      0.0,
+      0.015873015873015872
+    ],
+    "avg_accuracy": 0.2571428571428571,
+    "std_accuracy": 0.2620538296316056
+  }
+}

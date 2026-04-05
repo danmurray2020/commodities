@@ -1,0 +1,75 @@
+{
+  "commodity": "soybeans",
+  "ticker": "ZS=F",
+  "horizon": 63,
+  "features": [
+    "pct_up_days_126d",
+    "oni_change_3m",
+    "return_10d",
+    "price_vs_sma_10",
+    "macd_diff",
+    "volatility_63d",
+    "zscore_252d_change_21d",
+    "us_precip_7d_sum",
+    "us_temp_30d_avg",
+    "cot_comm_long",
+    "price_lag_2",
+    "brazil_total_precip",
+    "return_1d"
+  ],
+  "n_features": 13,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 735,
+      "max_depth": 4,
+      "learning_rate": 0.01166673926839719,
+      "subsample": 0.873699640290451,
+      "colsample_bytree": 0.4236304110837561,
+      "min_child_weight": 16,
+      "gamma": 0.05681109612383772,
+      "reg_alpha": 1.7446598737859333e-05,
+      "reg_lambda": 12.358354389987293,
+      "max_delta_step": 1.6609484368012084
+    },
+    "fold_accuracies": [
+      0.8412698412698413,
+      0.7301587301587301,
+      0.9047619047619048,
+      0.9047619047619048,
+      0.8571428571428571
+    ],
+    "avg_accuracy": 0.8476190476190476,
+    "std_accuracy": 0.06396648152257108
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 636,
+      "max_depth": 4,
+      "learning_rate": 0.17122524544987305,
+      "subsample": 0.6698490046137306,
+      "colsample_bytree": 0.900956980779593,
+      "min_child_weight": 14,
+      "gamma": 2.6386403422689275,
+      "reg_alpha": 3.409590767109896e-06,
+      "reg_lambda": 0.006291381877931479,
+      "max_delta_step": 4.993452747859898
+    },
+    "fold_accuracies": [
+      0.8412698412698413,
+      0.873015873015873,
+      0.9523809523809523,
+      0.9206349206349206,
+      0.873015873015873
+    ],
+    "avg_accuracy": 0.8920634920634921,
+    "std_accuracy": 0.0393957893523519
+  }
+}

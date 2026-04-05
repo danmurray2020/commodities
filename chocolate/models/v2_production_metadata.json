@@ -1,0 +1,79 @@
+{
+  "version": "v5",
+  "commodity": "Cocoa",
+  "ticker": "CC=F",
+  "horizon": 63,
+  "features": [
+    "sma_50_200_gap",
+    "zscore_252d",
+    "price_vs_sma_50",
+    "sma_5",
+    "indonesia_precip_30d_sum",
+    "sugar",
+    "trend_slope_21d",
+    "macd_signal",
+    "price_lag_5",
+    "zscore_126d",
+    "price_vs_sma_10",
+    "sma_10",
+    "crude_oil",
+    "cot_net_comm",
+    "westafrica_total_precip",
+    "usd_index",
+    "momentum_rank_252d",
+    "price_vs_sma_5",
+    "westafrica_temp_30d_avg",
+    "season_sin_2",
+    "indonesia_temp_anomaly"
+  ],
+  "n_features": 21,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.15,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 315,
+      "max_depth": 2,
+      "learning_rate": 0.2962442728801233,
+      "subsample": 0.6555191917547772,
+      "colsample_bytree": 0.9278783508457374,
+      "min_child_weight": 3,
+      "gamma": 0.9607692814684892,
+      "reg_alpha": 1.0631920268039215e-07,
+      "reg_lambda": 2.1462207500771246e-08,
+      "scale_pos_weight": 0.49668297029002667,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.9682539682539683,
+      0.9523809523809523,
+      0.9523809523809523,
+      1.0,
+      0.9841269841269841
+    ],
+    "avg_accuracy": 0.9714285714285713,
+    "std_accuracy": 0.018510958396334303
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 315,
+      "max_depth": 2,
+      "learning_rate": 0.2962442728801233,
+      "subsample": 0.6555191917547772,
+      "colsample_bytree": 0.9278783508457374,
+      "min_child_weight": 3,
+      "gamma": 0.9607692814684892,
+      "reg_alpha": 1.0631920268039215e-07,
+      "reg_lambda": 2.1462207500771246e-08,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

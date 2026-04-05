@@ -1,0 +1,70 @@
+{
+  "horizon": 63,
+  "features": [
+    "price_vs_sma_200",
+    "price_vs_sma_50",
+    "macd_signal",
+    "mei_change_3m",
+    "cot_noncomm_long",
+    "return_21d",
+    "vietnam_temp_30d_avg",
+    "cot_oi_change",
+    "price_lag_2",
+    "season_sin",
+    "sma_10",
+    "volatility_10d",
+    "bb_pct",
+    "brazil_temp_30d_avg",
+    "sma_5",
+    "price_lag_3",
+    "rsi_14"
+  ],
+  "n_features": 17,
+  "purge_gap": 63,
+  "regression": {
+    "params": {
+      "n_estimators": 179,
+      "max_depth": 7,
+      "learning_rate": 0.10697711392917339,
+      "subsample": 0.8433506140518732,
+      "colsample_bytree": 0.8213195123639712,
+      "min_child_weight": 29,
+      "gamma": 0.42432651164954005,
+      "reg_alpha": 8.023827735739364e-05,
+      "reg_lambda": 0.011679300296870893,
+      "max_delta_step": 0.12175320657720912
+    },
+    "fold_accuracies": [
+      1.0,
+      0.5396825396825397,
+      0.9206349206349206,
+      0.7619047619047619,
+      0.8412698412698413
+    ],
+    "avg_accuracy": 0.8126984126984127,
+    "std_accuracy": 0.1579026046405827
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 402,
+      "max_depth": 8,
+      "learning_rate": 0.0205718022943721,
+      "subsample": 0.7156088096982987,
+      "colsample_bytree": 0.5449495211853842,
+      "min_child_weight": 2,
+      "gamma": 2.341373975045423,
+      "reg_alpha": 5.18856508834967e-05,
+      "reg_lambda": 2.0539639931975315e-07,
+      "max_delta_step": 4.4635882826267
+    },
+    "fold_accuracies": [
+      1.0,
+      0.49206349206349204,
+      0.8095238095238095,
+      0.7619047619047619,
+      0.8412698412698413
+    ],
+    "avg_accuracy": 0.780952380952381,
+    "std_accuracy": 0.1650793650793651
+  }
+}

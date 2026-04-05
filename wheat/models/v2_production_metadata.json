@@ -1,0 +1,82 @@
+{
+  "version": "v5",
+  "commodity": "Wheat",
+  "ticker": "ZW=F",
+  "horizon": 63,
+  "features": [
+    "zscore_252d",
+    "cot_spec_ratio",
+    "volatility_21d",
+    "return_21d",
+    "zscore_126d",
+    "macd",
+    "oni_change_3m",
+    "season_cos_1",
+    "volatility_10d",
+    "us_temp_30d_avg",
+    "price_vs_sma_21",
+    "zscore_252d_change_21d",
+    "season_cos_2",
+    "pct_up_days_21d",
+    "macd_diff",
+    "momentum_rank_252d",
+    "price_vs_sma_10",
+    "price_vs_sma_200",
+    "bb_pct",
+    "price_vs_sma_50",
+    "pct_up_days_63d",
+    "rsi_14",
+    "oni",
+    "enso_state"
+  ],
+  "n_features": 24,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 351,
+      "max_depth": 4,
+      "learning_rate": 0.1704324814483007,
+      "subsample": 0.9654407836145557,
+      "colsample_bytree": 0.9184583084270359,
+      "min_child_weight": 25,
+      "gamma": 3.4339274651516773,
+      "reg_alpha": 2.2508863011299253e-08,
+      "reg_lambda": 0.05990290284661412,
+      "scale_pos_weight": 0.4114419565169704,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.8095238095238095,
+      0.7619047619047619,
+      0.873015873015873,
+      0.9365079365079365,
+      0.873015873015873
+    ],
+    "avg_accuracy": 0.850793650793651,
+    "std_accuracy": 0.0598982929019467
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 351,
+      "max_depth": 4,
+      "learning_rate": 0.1704324814483007,
+      "subsample": 0.9654407836145557,
+      "colsample_bytree": 0.9184583084270359,
+      "min_child_weight": 25,
+      "gamma": 3.4339274651516773,
+      "reg_alpha": 2.2508863011299253e-08,
+      "reg_lambda": 0.05990290284661412,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

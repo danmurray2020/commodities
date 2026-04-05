@@ -1,0 +1,73 @@
+{
+  "version": "v5",
+  "commodity": "NatGas",
+  "ticker": "NG=F",
+  "horizon": 126,
+  "features": [
+    "return_1d",
+    "return_5d",
+    "return_10d",
+    "return_21d",
+    "price_vs_sma_5",
+    "price_vs_sma_10",
+    "price_vs_sma_21",
+    "price_vs_sma_50",
+    "price_vs_sma_200",
+    "volatility_10d",
+    "volatility_21d",
+    "rsi_14",
+    "macd",
+    "macd_signal",
+    "macd_diff"
+  ],
+  "n_features": 15,
+  "purge_gap": 126,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.15,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 126,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 302,
+      "max_depth": 5,
+      "learning_rate": 0.03821925960906888,
+      "subsample": 0.7736779028210535,
+      "colsample_bytree": 0.895117383427867,
+      "min_child_weight": 19,
+      "gamma": 2.308514554039558,
+      "reg_alpha": 6.071821767005117e-07,
+      "reg_lambda": 0.016907335446289754,
+      "scale_pos_weight": 0.9335204951216058,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.6507936507936508,
+      0.6984126984126984,
+      0.9523809523809523,
+      0.7142857142857143,
+      0.7619047619047619
+    ],
+    "avg_accuracy": 0.7555555555555555,
+    "std_accuracy": 0.10461750510021636
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 302,
+      "max_depth": 5,
+      "learning_rate": 0.03821925960906888,
+      "subsample": 0.7736779028210535,
+      "colsample_bytree": 0.895117383427867,
+      "min_child_weight": 19,
+      "gamma": 2.308514554039558,
+      "reg_alpha": 6.071821767005117e-07,
+      "reg_lambda": 0.016907335446289754,
+      "random_state": 42
+    },
+    "avg_accuracy": 0,
+    "std_accuracy": 0,
+    "fold_accuracies": []
+  }
+}

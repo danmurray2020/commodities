@@ -1,0 +1,82 @@
+{
+  "version": "v3",
+  "commodity": "Coffee",
+  "ticker": "KC=F",
+  "horizon": 63,
+  "features": [
+    "sma_50_200_gap",
+    "trend_slope_126d",
+    "zscore_126d",
+    "momentum_rank_252d",
+    "cot_noncomm_long_chg",
+    "arabica_robusta_ratio_sma21",
+    "brl_vs_sma50",
+    "trend_slope_63d",
+    "cot_noncomm_short",
+    "brazil_temp_30d_avg",
+    "cot_noncomm_long",
+    "macd_signal",
+    "robusta",
+    "zscore_252d_change_21d",
+    "cot_oi_change",
+    "volatility_10d"
+  ],
+  "n_features": 16,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 183,
+      "max_depth": 2,
+      "learning_rate": 0.225156898939378,
+      "subsample": 0.6869917014209593,
+      "colsample_bytree": 0.49834074788832794,
+      "min_child_weight": 1,
+      "gamma": 0.013285254115378953,
+      "reg_alpha": 1.9091343389384108e-05,
+      "reg_lambda": 1.4396430544728413e-05,
+      "max_delta_step": 2.0019960726540873,
+      "scale_pos_weight": 0.656520369635589,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      1.0,
+      0.9047619047619048,
+      0.9047619047619048,
+      0.9523809523809523,
+      0.9365079365079365
+    ],
+    "avg_accuracy": 0.9396825396825397,
+    "std_accuracy": 0.03535088484336522
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 183,
+      "max_depth": 2,
+      "learning_rate": 0.225156898939378,
+      "subsample": 0.6869917014209593,
+      "colsample_bytree": 0.49834074788832794,
+      "min_child_weight": 1,
+      "gamma": 0.013285254115378953,
+      "reg_alpha": 1.9091343389384108e-05,
+      "reg_lambda": 1.4396430544728413e-05,
+      "max_delta_step": 2.0019960726540873,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      1.0,
+      0.36507936507936506,
+      0.4603174603174603,
+      0.9841269841269841,
+      0.8571428571428571
+    ],
+    "avg_accuracy": 0.7333333333333333,
+    "std_accuracy": 0.26813653858766573
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "version": "v3",
+  "commodity": "Natural Gas",
+  "ticker": "NG=F",
+  "horizon": 63,
+  "features": [
+    "macd_diff",
+    "cot_comm_short",
+    "pct_up_days_63d",
+    "season_sin_1",
+    "cot_net_spec",
+    "mei",
+    "crude_oil",
+    "heating_oil",
+    "usd_index",
+    "sp500",
+    "coal",
+    "return_1d",
+    "return_5d",
+    "return_10d",
+    "return_21d"
+  ],
+  "n_features": 15,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.15,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 649,
+      "max_depth": 7,
+      "learning_rate": 0.09278647891344848,
+      "subsample": 0.8472217624519465,
+      "colsample_bytree": 0.30658400221369886,
+      "min_child_weight": 13,
+      "gamma": 2.3717829028867223,
+      "reg_alpha": 3.371276395115891e-07,
+      "reg_lambda": 2.4413818359477e-06,
+      "max_delta_step": 4.013773104369574,
+      "scale_pos_weight": 0.648173457912506,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.6190476190476191,
+      0.7936507936507936,
+      0.8412698412698413,
+      0.8095238095238095,
+      0.7142857142857143
+    ],
+    "avg_accuracy": 0.7555555555555555,
+    "std_accuracy": 0.08006044579630787
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 649,
+      "max_depth": 7,
+      "learning_rate": 0.09278647891344848,
+      "subsample": 0.8472217624519465,
+      "colsample_bytree": 0.30658400221369886,
+      "min_child_weight": 13,
+      "gamma": 2.3717829028867223,
+      "reg_alpha": 3.371276395115891e-07,
+      "reg_lambda": 2.4413818359477e-06,
+      "max_delta_step": 4.013773104369574,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.873015873015873,
+      0.2222222222222222,
+      0.15873015873015872,
+      0.8571428571428571,
+      0.6031746031746031
+    ],
+    "avg_accuracy": 0.5428571428571429,
+    "std_accuracy": 0.3039009001593478
+  }
+}

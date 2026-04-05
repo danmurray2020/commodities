@@ -1,0 +1,83 @@
+{
+  "commodity": "cocoa",
+  "ticker": "CC=F",
+  "horizon": 63,
+  "features": [
+    "sma_50_200_gap",
+    "zscore_252d",
+    "price_vs_sma_50",
+    "sma_5",
+    "indonesia_precip_30d_sum",
+    "sugar",
+    "trend_slope_21d",
+    "macd_signal",
+    "price_lag_5",
+    "zscore_126d",
+    "price_vs_sma_10",
+    "sma_10",
+    "crude_oil",
+    "cot_net_comm",
+    "westafrica_total_precip",
+    "usd_index",
+    "momentum_rank_252d",
+    "price_vs_sma_5",
+    "westafrica_temp_30d_avg",
+    "season_sin_2",
+    "indonesia_temp_anomaly"
+  ],
+  "n_features": 21,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 434,
+      "max_depth": 9,
+      "learning_rate": 0.2502270788021209,
+      "subsample": 0.605703884984873,
+      "colsample_bytree": 0.3288175139365902,
+      "min_child_weight": 17,
+      "gamma": 0.08691758719774811,
+      "reg_alpha": 2.485350034723286e-08,
+      "reg_lambda": 2.7766496307535964e-06,
+      "max_delta_step": 2.2050148175880873
+    },
+    "fold_accuracies": [
+      0.8888888888888888,
+      0.9365079365079365,
+      0.9365079365079365,
+      0.0,
+      0.9047619047619048
+    ],
+    "avg_accuracy": 0.7333333333333333,
+    "std_accuracy": 0.3671301955694549
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 450,
+      "max_depth": 4,
+      "learning_rate": 0.19632125521150767,
+      "subsample": 0.9558243525928417,
+      "colsample_bytree": 0.5955242897423403,
+      "min_child_weight": 3,
+      "gamma": 7.633524582954314,
+      "reg_alpha": 0.0016441966597969587,
+      "reg_lambda": 0.00935927114554379,
+      "max_delta_step": 2.849948799171449
+    },
+    "fold_accuracies": [
+      0.9523809523809523,
+      0.9682539682539683,
+      0.9206349206349206,
+      0.0,
+      0.6825396825396826
+    ],
+    "avg_accuracy": 0.7047619047619047,
+    "std_accuracy": 0.36729486487379676
+  }
+}

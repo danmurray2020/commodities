@@ -1,0 +1,81 @@
+{
+  "version": "v3",
+  "commodity": "Sugar",
+  "ticker": "SB=F",
+  "horizon": 63,
+  "features": [
+    "brazil_harvest",
+    "cot_comm_long",
+    "usd_index",
+    "crude_oil",
+    "coffee",
+    "cocoa",
+    "sp500",
+    "brl_usd",
+    "inr_usd",
+    "return_1d",
+    "return_5d",
+    "return_21d",
+    "sma_5",
+    "price_vs_sma_5",
+    "sma_10"
+  ],
+  "n_features": 15,
+  "purge_gap": 63,
+  "strategy": {
+    "confidence_threshold": 0.75,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "classification": {
+    "params": {
+      "n_estimators": 714,
+      "max_depth": 10,
+      "learning_rate": 0.01586067185574952,
+      "subsample": 0.9048409983813628,
+      "colsample_bytree": 0.8787748399559439,
+      "min_child_weight": 18,
+      "gamma": 9.68981460620494,
+      "reg_alpha": 3.6425117903119432e-06,
+      "reg_lambda": 0.049226254267910434,
+      "max_delta_step": 1.0939585877199165,
+      "scale_pos_weight": 0.21749813762932055,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.9206349206349206,
+      0.9841269841269841,
+      0.9523809523809523,
+      0.9206349206349206,
+      0.746031746031746
+    ],
+    "avg_accuracy": 0.9047619047619048,
+    "std_accuracy": 0.08278352260574788
+  },
+  "regression": {
+    "params": {
+      "n_estimators": 714,
+      "max_depth": 10,
+      "learning_rate": 0.01586067185574952,
+      "subsample": 0.9048409983813628,
+      "colsample_bytree": 0.8787748399559439,
+      "min_child_weight": 18,
+      "gamma": 9.68981460620494,
+      "reg_alpha": 3.6425117903119432e-06,
+      "reg_lambda": 0.049226254267910434,
+      "max_delta_step": 1.0939585877199165,
+      "random_state": 42
+    },
+    "fold_accuracies": [
+      0.07936507936507936,
+      0.015873015873015872,
+      0.047619047619047616,
+      0.07936507936507936,
+      0.25396825396825395
+    ],
+    "avg_accuracy": 0.09523809523809523,
+    "std_accuracy": 0.08278352260574791
+  }
+}

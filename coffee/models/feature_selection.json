@@ -1,0 +1,401 @@
+{
+  "horizon": 63,
+  "total_features": 75,
+  "selected_features": [
+    "price_vs_sma_200",
+    "price_vs_sma_50",
+    "macd_signal",
+    "mei_change_3m",
+    "cot_noncomm_long",
+    "return_21d",
+    "vietnam_temp_30d_avg",
+    "cot_oi_change",
+    "price_lag_2",
+    "season_sin",
+    "sma_10",
+    "volatility_10d",
+    "bb_pct",
+    "brazil_temp_30d_avg",
+    "sma_5",
+    "price_lag_3",
+    "rsi_14"
+  ],
+  "n_selected": 17,
+  "ranking": [
+    {
+      "feature": "price_vs_sma_200",
+      "importance": 0.04761904761904763,
+      "std": 0.08603116030960926
+    },
+    {
+      "feature": "price_vs_sma_50",
+      "importance": 0.018412698412698422,
+      "std": 0.036036990038647854
+    },
+    {
+      "feature": "macd_signal",
+      "importance": 0.013650793650793655,
+      "std": 0.02730158730158731
+    },
+    {
+      "feature": "mei_change_3m",
+      "importance": 0.006349206349206353,
+      "std": 0.012698412698412705
+    },
+    {
+      "feature": "cot_noncomm_long",
+      "importance": 0.005714285714285725,
+      "std": 0.007280853930907766
+    },
+    {
+      "feature": "return_21d",
+      "importance": 0.005079365079365085,
+      "std": 0.009385235237520316
+    },
+    {
+      "feature": "vietnam_temp_30d_avg",
+      "importance": 0.004444444444444449,
+      "std": 0.008888888888888898
+    },
+    {
+      "feature": "cot_oi_change",
+      "importance": 0.004126984126984141,
+      "std": 0.005079365079365097
+    },
+    {
+      "feature": "price_lag_2",
+      "importance": 0.002539682539682546,
+      "std": 0.005079365079365092
+    },
+    {
+      "feature": "season_sin",
+      "importance": 0.00222222222222223,
+      "std": 0.00444444444444446
+    },
+    {
+      "feature": "sma_10",
+      "importance": 0.0022222222222222253,
+      "std": 0.0044444444444444505
+    },
+    {
+      "feature": "volatility_10d",
+      "importance": 0.0022222222222222253,
+      "std": 0.0044444444444444505
+    },
+    {
+      "feature": "bb_pct",
+      "importance": 0.0019047619047619113,
+      "std": 0.0038095238095238225
+    },
+    {
+      "feature": "brazil_temp_30d_avg",
+      "importance": 0.0015873015873015927,
+      "std": 0.0031746031746031854
+    },
+    {
+      "feature": "sma_5",
+      "importance": 0.0012698412698412742,
+      "std": 0.0025396825396825484
+    },
+    {
+      "feature": "price_lag_3",
+      "importance": 0.0012698412698412742,
+      "std": 0.0025396825396825484
+    },
+    {
+      "feature": "rsi_14",
+      "importance": 0.0006349206349206394,
+      "std": 0.0012698412698412787
+    },
+    {
+      "feature": "crude_oil",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brl_usd",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "return_1d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "return_5d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "return_10d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "price_vs_sma_10",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "sma_21",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "price_vs_sma_21",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "sma_50",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "sma_200",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "volatility_21d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "volatility_63d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "macd",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "macd_diff",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "bb_high",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "bb_low",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "price_lag_1",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "price_lag_5",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "price_lag_10",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "day_of_week",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "month",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "season_cos",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "season_sin_2",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "season_cos_2",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_harvest",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_harvest",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_open_interest",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_comm_long",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_noncomm_long_chg",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_noncomm_short_chg",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_net_spec",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_net_comm",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_spec_ratio",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "cot_comm_net_pct_oi",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_avg_temp",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_avg_temp",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_total_precip",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_total_precip",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_temp_7d_avg",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_temp_7d_avg",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_precip_7d_sum",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_precip_7d_sum",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_precip_30d_sum",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_precip_30d_sum",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_temp_anomaly",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "vietnam_temp_anomaly",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_frost_risk",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "brazil_drought_30d",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "oni",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "enso_state",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "oni_change_3m",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "sugar",
+      "importance": -0.00031746031746031854,
+      "std": 0.0006349206349206371
+    },
+    {
+      "feature": "cot_noncomm_short",
+      "importance": -0.000952380952380949,
+      "std": 0.0019047619047618978
+    },
+    {
+      "feature": "cot_comm_short",
+      "importance": -0.0012698412698412653,
+      "std": 0.0025396825396825306
+    },
+    {
+      "feature": "mei",
+      "importance": -0.0012698412698412653,
+      "std": 0.0025396825396825306
+    },
+    {
+      "feature": "sp500",
+      "importance": -0.0012698412698412677,
+      "std": 0.0025396825396825358
+    },
+    {
+      "feature": "usd_index",
+      "importance": -0.0015873015873015771,
+      "std": 0.0031746031746031542
+    },
+    {
+      "feature": "price_vs_sma_5",
+      "importance": -0.0022222222222222144,
+      "std": 0.004444444444444429
+    }
+  ]
+}
