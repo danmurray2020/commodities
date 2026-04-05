@@ -27,6 +27,7 @@ def fetch_supplementary_data() -> dict[str, pd.DataFrame]:
         "sugar": "SB=F",               # Sugar (competing crop in some regions)
         "sp500": "^GSPC",              # S&P 500 (risk sentiment)
         "ghs_usd": "GHSUSD=X",        # Ghanaian Cedi (Ghana = #2 producer)
+        "eur_usd": "EURUSD=X",        # EUR/USD (London ICE cocoa trades in EUR)
         "coffee": "KC=F",              # Coffee (correlated soft commodity)
     }
     supplementary = {}

@@ -3,29 +3,33 @@
   "ticker": "CC=F",
   "horizon": 63,
   "features": [
+    "zscore_126d",
+    "season_sin",
+    "price_vs_sma_50",
+    "season_cos",
     "sma_50_200_gap",
     "zscore_252d",
-    "price_vs_sma_50",
-    "sma_5",
     "indonesia_precip_30d_sum",
-    "sugar",
-    "trend_slope_21d",
-    "macd_signal",
-    "price_lag_5",
-    "zscore_126d",
-    "price_vs_sma_10",
+    "cot_spec_ratio",
     "sma_10",
-    "crude_oil",
-    "cot_net_comm",
-    "westafrica_total_precip",
-    "usd_index",
-    "momentum_rank_252d",
-    "price_vs_sma_5",
-    "westafrica_temp_30d_avg",
-    "season_sin_2",
-    "indonesia_temp_anomaly"
+    "price_vs_sma_10",
+    "bb_pct",
+    "price_lag_5",
+    "trend_slope_126d",
+    "price_vs_sma_21",
+    "price_lag_1",
+    "price_lag_10",
+    "oni_change_3m",
+    "return_5d",
+    "macd_diff",
+    "cot_comm_net_pct_oi",
+    "return_10d",
+    "trend_slope_63d",
+    "westafrica_precip_30d_sum",
+    "cot_noncomm_long_chg",
+    "indonesia_avg_temp"
   ],
-  "n_features": 21,
+  "n_features": 25,
   "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.7,
@@ -36,48 +40,70 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 434,
-      "max_depth": 9,
-      "learning_rate": 0.2502270788021209,
-      "subsample": 0.605703884984873,
-      "colsample_bytree": 0.3288175139365902,
-      "min_child_weight": 17,
-      "gamma": 0.08691758719774811,
-      "reg_alpha": 2.485350034723286e-08,
-      "reg_lambda": 2.7766496307535964e-06,
-      "max_delta_step": 2.2050148175880873
+      "n_estimators": 758,
+      "max_depth": 7,
+      "learning_rate": 0.2228024549001186,
+      "subsample": 0.5589833681684558,
+      "colsample_bytree": 0.4384549825430658,
+      "min_child_weight": 14,
+      "gamma": 2.7232432362630283,
+      "reg_alpha": 1.0037496363538663e-08,
+      "reg_lambda": 0.24417810133198303,
+      "max_delta_step": 3.9375723348680545
     },
     "fold_accuracies": [
+      0.5238095238095238,
       0.8888888888888888,
-      0.9365079365079365,
-      0.9365079365079365,
-      0.0,
-      0.9047619047619048
+      0.5396825396825397,
+      0.015873015873015872,
+      0.0
     ],
-    "avg_accuracy": 0.7333333333333333,
-    "std_accuracy": 0.3671301955694549
+    "avg_accuracy": 0.3936507936507936,
+    "std_accuracy": 0.3409411484656218,
+    "fold_maes": [
+      0.23857238199865527,
+      0.18337937892896508,
+      0.3442885089917441,
+      0.62513169960465,
+      0.6850442067654132
+    ],
+    "fold_rmses": [
+      0.28884316281275707,
+      0.20795833440565867,
+      0.3520475418727785,
+      0.6770291408131904,
+      0.6882378480564378
+    ],
+    "avg_mae": 0.4152832352578855,
+    "avg_rmse": 0.44282320559216454
   },
   "classification": {
     "params": {
-      "n_estimators": 450,
+      "n_estimators": 461,
       "max_depth": 4,
-      "learning_rate": 0.19632125521150767,
-      "subsample": 0.9558243525928417,
-      "colsample_bytree": 0.5955242897423403,
-      "min_child_weight": 3,
-      "gamma": 7.633524582954314,
-      "reg_alpha": 0.0016441966597969587,
-      "reg_lambda": 0.00935927114554379,
-      "max_delta_step": 2.849948799171449
+      "learning_rate": 0.014363547307596565,
+      "subsample": 0.5748191071551503,
+      "colsample_bytree": 0.5139948400294448,
+      "min_child_weight": 2,
+      "gamma": 9.022146381477352,
+      "reg_alpha": 94.73511338471322,
+      "reg_lambda": 1.3817578597394445e-06,
+      "max_delta_step": 0.2607459937823
     },
     "fold_accuracies": [
-      0.9523809523809523,
-      0.9682539682539683,
-      0.9206349206349206,
-      0.0,
-      0.6825396825396826
+      0.47619047619047616,
+      0.873015873015873,
+      1.0,
+      0.9841269841269841,
+      1.0
     ],
-    "avg_accuracy": 0.7047619047619047,
-    "std_accuracy": 0.36729486487379676
+    "avg_accuracy": 0.8666666666666668,
+    "std_accuracy": 0.20093006220249726
+  },
+  "holdout": {
+    "size": 126,
+    "reg_direction_accuracy": 0.007936507936507936,
+    "reg_mae": 0.6240690842093359,
+    "clf_accuracy": 0.9920634920634921
   }
 }

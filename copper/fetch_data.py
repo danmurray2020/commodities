@@ -24,6 +24,7 @@ def fetch_supplementary_data() -> dict[str, pd.DataFrame]:
         "crude_oil": "CL=F",
         "sp500": "^GSPC",
         "cny_usd": "CNYUSD=X",    # China = 50%+ of global copper demand
+        "clp_usd": "CLPUSD=X",    # Chilean Peso (Chile = #1 copper producer)
         "iron_ore": "TIO=F",       # Correlated industrial metal
     }
     supplementary = {}

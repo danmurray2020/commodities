@@ -24,6 +24,7 @@ def fetch_supplementary_data() -> dict[str, pd.DataFrame]:
         "crude_oil": "CL=F",
         "corn": "ZC=F",           # Competing grain
         "soybeans": "ZS=F",       # Grain complex
+        "eur_usd": "EURUSD=X",   # EUR/USD (France/EU major wheat exporter)
         "sp500": "^GSPC",
     }
     supplementary = {}
