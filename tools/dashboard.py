@@ -182,6 +182,51 @@ def load_commodity(project_dir: Path, commodity_name: str, ticker: str, price_co
     }
 
 
+def load_portfolio_data(commodities_list):
+    """Build portfolio position data from active signals and DB trades."""
+    positions = []
+    for c in commodities_list:
+        if not c or c["strategy"]["action"] == "NO TRADE":
+            continue
+        positions.append({
+            "name": c["name"],
+            "color": c["color"],
+            "direction": c["strategy"]["action"],
+            "entry": c["strategy"]["entry"],
+            "tp": c["strategy"]["take_profit"],
+            "sl": c["strategy"]["stop_loss"],
+            "tp_pct": c["strategy"]["take_profit_pct"],
+            "sl_pct": c["strategy"]["stop_loss_pct"],
+            "rr": c["strategy"]["risk_reward"],
+            "confidence": c["confidence"],
+            "pred_return": c["predicted_return"],
+            "current_price": c["current_price"],
+        })
+
+    # Try loading trade stats and history from DB
+    trade_stats = None
+    recent_trades = []
+    prediction_accuracy = None
+    try:
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from db import get_db
+        db = get_db()
+        trade_stats = db.get_trade_stats()
+        recent_trades = db.execute(
+            "SELECT * FROM trades WHERE exit_date IS NOT NULL ORDER BY exit_date DESC LIMIT 20"
+        )
+        prediction_accuracy = db.get_prediction_accuracy()
+    except Exception:
+        pass
+
+    return {
+        "positions": positions,
+        "trade_stats": trade_stats,
+        "recent_trades": recent_trades,
+        "prediction_accuracy": prediction_accuracy,
+    }
+
+
 def compute_correlation(coffee_dir: Path, cocoa_dir: Path):
     """Compute rolling correlation between coffee and cocoa returns."""
     try:
@@ -385,6 +430,119 @@ TEMPLATE = """
     </div>
     {% endif %}
 
+    {% if portfolio and portfolio.positions %}
+    <div class="section-card">
+        <div class="section-title">Active Positions & Portfolio Allocation</div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+            <!-- Position bars (entry/TP/SL visual) -->
+            <div>
+                <div style="font-size:12px; color:#71717a; text-transform:uppercase; margin-bottom:12px">Position Map (Entry / TP / SL)</div>
+                {% for pos in portfolio.positions %}
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                        <span style="font-weight:600;">{{ pos.direction }} {{ pos.name }}</span>
+                        <span style="color:{{ '#22c55e' if pos.direction == 'LONG' else '#ef4444' }}; font-size:13px">{{ "%.0f"|format(pos.confidence * 100) }}% conf</span>
+                    </div>
+                    <div style="position:relative; height:32px; background:#0f1117; border-radius:6px; overflow:hidden;">
+                        {% if pos.direction == "LONG" %}
+                        <!-- SL (left) → Entry (center) → TP (right) -->
+                        {% set range = pos.tp - pos.sl %}
+                        {% set entry_pct = ((pos.entry - pos.sl) / range * 100) if range > 0 else 50 %}
+                        {% set current_pct = ((pos.current_price - pos.sl) / range * 100) if range > 0 else 50 %}
+                        <div style="position:absolute; left:0; top:0; height:100%; width:{{ entry_pct }}%; background:rgba(239,68,68,0.15);"></div>
+                        <div style="position:absolute; left:{{ entry_pct }}%; top:0; height:100%; right:0; background:rgba(34,197,94,0.15);"></div>
+                        <div style="position:absolute; left:{{ entry_pct }}%; top:0; height:100%; width:2px; background:#a1a1aa;" title="Entry ${{ '%.2f'|format(pos.entry) }}"></div>
+                        <div style="position:absolute; left:{{ current_pct }}%; top:0; height:100%; width:3px; background:#fff; border-radius:2px;" title="Current ${{ '%.2f'|format(pos.current_price) }}"></div>
+                        <div style="position:absolute; left:4px; top:50%; transform:translateY(-50%); font-size:10px; color:#ef4444;">SL ${{ "%.0f"|format(pos.sl) }}</div>
+                        <div style="position:absolute; right:4px; top:50%; transform:translateY(-50%); font-size:10px; color:#22c55e;">TP ${{ "%.0f"|format(pos.tp) }}</div>
+                        {% else %}
+                        {% set range = pos.sl - pos.tp %}
+                        {% set entry_pct = ((pos.entry - pos.tp) / range * 100) if range > 0 else 50 %}
+                        {% set current_pct = ((pos.current_price - pos.tp) / range * 100) if range > 0 else 50 %}
+                        <div style="position:absolute; left:0; top:0; height:100%; width:{{ entry_pct }}%; background:rgba(34,197,94,0.15);"></div>
+                        <div style="position:absolute; left:{{ entry_pct }}%; top:0; height:100%; right:0; background:rgba(239,68,68,0.15);"></div>
+                        <div style="position:absolute; left:{{ entry_pct }}%; top:0; height:100%; width:2px; background:#a1a1aa;"></div>
+                        <div style="position:absolute; left:{{ current_pct }}%; top:0; height:100%; width:3px; background:#fff; border-radius:2px;"></div>
+                        <div style="position:absolute; left:4px; top:50%; transform:translateY(-50%); font-size:10px; color:#22c55e;">TP ${{ "%.0f"|format(pos.tp) }}</div>
+                        <div style="position:absolute; right:4px; top:50%; transform:translateY(-50%); font-size:10px; color:#ef4444;">SL ${{ "%.0f"|format(pos.sl) }}</div>
+                        {% endif %}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:11px; color:#71717a; margin-top:2px;">
+                        <span>R:R {{ "%.1f"|format(pos.rr) }}x</span>
+                        <span>Target {{ "%+.1f"|format(pos.pred_return * 100) }}%</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Allocation donut -->
+            <div>
+                <div style="font-size:12px; color:#71717a; text-transform:uppercase; margin-bottom:12px">Portfolio Allocation</div>
+                <div style="height:220px"><canvas id="allocationChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if portfolio and portfolio.trade_stats and portfolio.trade_stats.total_trades > 0 %}
+    <div class="section-card">
+        <div class="section-title">Trade Performance</div>
+        <div style="display:grid; grid-template-columns: repeat(6, 1fr); gap:8px; margin-bottom:16px;">
+            <div class="stat"><div class="stat-val">{{ portfolio.trade_stats.total_trades }}</div><div class="stat-label">Trades</div></div>
+            <div class="stat"><div class="stat-val {{ 'up' if portfolio.trade_stats.win_rate > 0.55 else 'neutral' }}">{{ "%.0f"|format(portfolio.trade_stats.win_rate * 100) }}%</div><div class="stat-label">Win Rate</div></div>
+            <div class="stat"><div class="stat-val up">{{ "%+.1f"|format(portfolio.trade_stats.avg_win * 100) }}%</div><div class="stat-label">Avg Win</div></div>
+            <div class="stat"><div class="stat-val down">{{ "%+.1f"|format(portfolio.trade_stats.avg_loss * 100) }}%</div><div class="stat-label">Avg Loss</div></div>
+            <div class="stat"><div class="stat-val {{ 'up' if portfolio.trade_stats.total_pnl > 0 else 'down' }}">{{ "%+.1f"|format(portfolio.trade_stats.total_pnl * 100) }}%</div><div class="stat-label">Total P&L</div></div>
+            <div class="stat"><div class="stat-val">{{ "%.0f"|format(portfolio.trade_stats.avg_hold_days) }}d</div><div class="stat-label">Avg Hold</div></div>
+        </div>
+
+        {% if portfolio.recent_trades %}
+        <div style="font-size:12px; color:#71717a; text-transform:uppercase; margin-bottom:8px;">Recent Trades</div>
+        <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead><tr style="color:#71717a; text-align:left; border-bottom:1px solid #27272a;">
+                <th style="padding:6px">Date</th><th>Commodity</th><th>Direction</th><th>Entry</th><th>Exit</th><th>P&L</th><th>Days</th><th>Reason</th>
+            </tr></thead>
+            <tbody>
+            {% for t in portfolio.recent_trades %}
+            <tr style="border-bottom:1px solid #1e1e22;">
+                <td style="padding:4px 6px">{{ t.entry_date }}</td>
+                <td>{{ t.commodity }}</td>
+                <td style="color:{{ '#22c55e' if t.direction == 'LONG' else '#ef4444' }}">{{ t.direction }}</td>
+                <td>${{ "%.2f"|format(t.entry_price) }}</td>
+                <td>${{ "%.2f"|format(t.exit_price) }}</td>
+                <td class="{{ 'up' if t.pnl_pct > 0 else 'down' }}">{{ "%+.1f"|format(t.pnl_pct * 100) }}%</td>
+                <td>{{ t.hold_days }}</td>
+                <td style="color:#71717a">{{ t.exit_reason }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if portfolio and portfolio.prediction_accuracy and portfolio.prediction_accuracy.total > 0 %}
+    <div class="section-card">
+        <div class="section-title">Prediction Accuracy (Realized)</div>
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-val">{{ portfolio.prediction_accuracy.total }}</div>
+                <div class="stat-label">Verified</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val {{ 'up' if portfolio.prediction_accuracy.accuracy > 0.55 else 'neutral' }}">{{ "%.0f"|format(portfolio.prediction_accuracy.accuracy * 100) }}%</div>
+                <div class="stat-label">Direction Accuracy</div>
+            </div>
+            {% if portfolio.prediction_accuracy.high_confidence_accuracy %}
+            <div class="stat">
+                <div class="stat-val {{ 'up' if portfolio.prediction_accuracy.high_confidence_accuracy > 0.6 else 'neutral' }}">{{ "%.0f"|format(portfolio.prediction_accuracy.high_confidence_accuracy * 100) }}%</div>
+                <div class="stat-label">High-Conf Accuracy</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="disclaimer">
         <strong>Disclaimer:</strong> For educational/research purposes only. Not financial advice.
         Both models use purged walk-forward cross-validation. Check weekly after COT data release (Saturdays).
@@ -413,6 +571,27 @@ TEMPLATE = """
 {% endif %}
 {% endfor %}
 
+{% if portfolio and portfolio.positions %}
+(function() {
+    const ctx = document.getElementById('allocationChart');
+    if (!ctx) return;
+    const positions = {{ portfolio.positions | tojson }};
+    const labels = positions.map(p => p.name);
+    const sizes = positions.map(p => Math.abs(p.pred_return) * 100);
+    const colors = positions.map(p => p.color);
+    const cash = 100 - sizes.reduce((a, b) => a + b, 0);
+    labels.push('Cash');
+    sizes.push(Math.max(cash, 0));
+    colors.push('#27272a');
+    new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{
+        data: sizes, backgroundColor: colors, borderColor: '#18181b', borderWidth: 2,
+    }]}, options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+        plugins: { legend: { position: 'bottom', labels: { color: '#a1a1aa', font: { size: 11 }, padding: 12 } },
+            tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': ' + ctx.raw.toFixed(1) + '%'; } } } }
+    }});
+})();
+{% endif %}
+
 {% if correlation %}
 (function() {
     const ctx = document.getElementById('corrChart').getContext('2d');
@@ -439,7 +618,8 @@ def index():
     copper = load_commodity(COPPER_DIR, "Copper", "HG=F", "copper_close", "#f97316")
     commodities = [c for c in [coffee, cocoa, sugar, natgas, soybeans, wheat, copper] if c is not None]
     correlation = compute_correlation(COFFEE_DIR, COCOA_DIR)
-    return render_template_string(TEMPLATE, commodities=commodities, correlation=correlation)
+    portfolio = load_portfolio_data(commodities)
+    return render_template_string(TEMPLATE, commodities=commodities, correlation=correlation, portfolio=portfolio)
 
 
 @app.route("/api/all")
