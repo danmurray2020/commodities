@@ -9,6 +9,13 @@ Usage:
     python -m agents research [commodities...]    # Research Agent
     python -m agents innovate [commodities...]    # Innovation Agent (web research)
     python -m agents backtest [commodities...]    # Backtesting Agent
+    python -m agents execute                      # Execution Agent (costs/friction)
+    python -m agents risk                         # Risk Management Agent
+    python -m agents regime [commodities...]      # Regime Detection Agent
+    python -m agents alpha [commodities...]       # Alpha Decay Agent
+    python -m agents compliance                   # Compliance Agent
+    python -m agents infra                        # Infrastructure Agent
+    python -m agents pnl                          # P&L Forecast Agent
     python -m agents weekly [commodities...]      # Full weekly pipeline
     python -m agents health                       # Quick health check
 """
@@ -49,13 +56,33 @@ def main():
     elif command == "backtest":
         from .backtesting import main as run
         run()
+    elif command == "execute":
+        from .execution import main as run
+        run()
+    elif command == "risk":
+        from .risk import main as run
+        run()
+    elif command == "regime":
+        from .regime import main as run
+        run()
+    elif command == "alpha":
+        from .alpha_decay import main as run
+        run()
+    elif command == "compliance":
+        from .compliance import main as run
+        run()
+    elif command == "infra":
+        from .infrastructure import main as run
+        run()
+    elif command in ("pnl", "forecast"):
+        from .pnl_forecast import main as run
+        run()
     elif command in ("weekly", "run"):
         from .orchestrator import main as run
         run()
     elif command == "health":
         from .validation import run_system_health_check
         from .config import COMMODITIES
-        import json
         results = run_system_health_check()
         for key, health in results.items():
             cfg = COMMODITIES[key]
