@@ -7,6 +7,8 @@ Usage:
     python -m agents strategy                     # Strategy/Risk Agent
     python -m agents monitor [--accuracy]         # Monitoring Agent
     python -m agents research [commodities...]    # Research Agent
+    python -m agents innovate [commodities...]    # Innovation Agent (web research)
+    python -m agents backtest [commodities...]    # Backtesting Agent
     python -m agents weekly [commodities...]      # Full weekly pipeline
     python -m agents health                       # Quick health check
 """
@@ -40,6 +42,12 @@ def main():
         run()
     elif command == "research":
         from .research import main as run
+        run()
+    elif command == "innovate":
+        from .innovation import main as run
+        run()
+    elif command == "backtest":
+        from .backtesting import main as run
         run()
     elif command in ("weekly", "run"):
         from .orchestrator import main as run
