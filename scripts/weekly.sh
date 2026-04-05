@@ -25,7 +25,7 @@ echo "$RESEARCH_OUTPUT" > "$LOG_DIR/research_${DATE}.txt"
 DB_OUTPUT=$(python3 -m db predictions 2>&1 && python3 -m db health 2>&1)
 
 # Combine and send to Claude for Slack
-cat <<EOF | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__Slack__*' -p \
+cat <<EOF | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__claude_ai_Slack__slack_send_message,mcp__claude_ai_Slack__slack_search_users' -p \
   "Here is this week's full commodities pipeline output. Send a Slack DM to user ID U07BRUFVDDE with a weekly summary.
 
 Format with sections: SIGNALS, HEALTH, PERFORMANCE, RECOMMENDATIONS.

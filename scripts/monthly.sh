@@ -25,14 +25,14 @@ python3 -m agents research >> "$LOG_DIR/monthly_${DATE}.txt" 2>&1
 # Fresh predictions with new models
 python3 -m agents predict >> "$LOG_DIR/monthly_${DATE}.txt" 2>&1
 
-# Git commit updated models
+# Git commit only model files and metadata (not arbitrary files)
 cd "$REPO_DIR"
-git add -A
+git add */models/production_*.joblib */models/production_metadata.json
 git commit -m "Monthly retrain $(date +%Y-%m-%d)" 2>/dev/null || true
 git push 2>/dev/null || true
 
 # Send summary via Claude + Slack
-cat "$LOG_DIR/monthly_${DATE}.txt" | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__Slack__*' -p \
+cat "$LOG_DIR/monthly_${DATE}.txt" | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__claude_ai_Slack__slack_send_message,mcp__claude_ai_Slack__slack_search_users' -p \
   "Here is the monthly retrain output for all 7 commodities. Send a Slack DM to user ID U07BRUFVDDE with:
 
 RETRAIN RESULTS: Per commodity old vs new accuracy, improved Y/N

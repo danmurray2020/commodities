@@ -29,9 +29,14 @@ def main():
         tables = db.execute(
             "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
         )
+        # Whitelist valid table names to prevent SQL injection
+        valid_tables = {"models", "predictions", "trades", "data_health", "agent_runs", "sqlite_sequence"}
         for t in tables:
-            count = db.execute(f"SELECT COUNT(*) as n FROM {t['name']}")[0]["n"]
-            print(f"  {t['name']:<20} {count:>6} rows")
+            name = t["name"]
+            if name not in valid_tables:
+                continue
+            count = db.execute(f"SELECT COUNT(*) as n FROM [{name}]")[0]["n"]
+            print(f"  {name:<20} {count:>6} rows")
 
     elif cmd == "predictions":
         commodity = sys.argv[2] if len(sys.argv) > 2 else None
@@ -125,6 +130,10 @@ def main():
             print("Usage: python -m db sql \"SELECT ...\"")
             return
         query = sys.argv[2]
+        # Only allow read-only queries
+        if not query.strip().upper().startswith("SELECT"):
+            print("Error: Only SELECT queries are allowed via CLI.")
+            return
         rows = db.execute(query)
         for r in rows:
             print(json.dumps(r, default=str))

@@ -99,9 +99,12 @@ def check_commodity(project_dir: Path, name: str, ticker: str, price_col: str) -
 def send_macos_notification(title: str, message: str):
     """Send a macOS notification via osascript."""
     try:
+        # Escape double quotes to prevent AppleScript injection
+        safe_title = title.replace('"', '\\"').replace("\\", "\\\\")
+        safe_message = message.replace('"', '\\"').replace("\\", "\\\\")
         subprocess.run([
             "osascript", "-e",
-            f'display notification "{message}" with title "{title}" sound name "Glass"'
+            f'display notification "{safe_message}" with title "{safe_title}" sound name "Glass"'
         ], capture_output=True, timeout=5)
     except Exception:
         pass

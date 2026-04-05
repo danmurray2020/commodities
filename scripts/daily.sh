@@ -20,7 +20,7 @@ OUTPUT=$(python3 -m agents refresh 2>&1 && python3 -m agents predict 2>&1 && pyt
 echo "$OUTPUT" > "$LOG_DIR/daily_${DATE}.txt"
 
 # Send to Claude to interpret and Slack
-echo "$OUTPUT" | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__Slack__*' -p \
+echo "$OUTPUT" | $CLAUDE --print --permission-mode bypassPermissions --allowedTools 'mcp__claude_ai_Slack__slack_send_message,mcp__claude_ai_Slack__slack_search_users' -p \
   "Here is today's commodities pipeline output. Summarize it and send a Slack DM to user ID U07BRUFVDDE with:
 - Active signals (commodity, direction, confidence, predicted return)
 - Any warnings or failures
