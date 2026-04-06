@@ -25,74 +25,142 @@ app = Flask(__name__)
 def _run_prediction_subprocess(project_dir: Path, price_col: str) -> dict:
     """Run prediction in a subprocess to isolate module imports."""
     import subprocess
-    script = f"""
-import json, sys, joblib, pandas as pd
-sys.path.insert(0, '.')
-from features import add_price_features, merge_cot_data, merge_weather_data, merge_enso_data
 
-# Build features without target so we can use the very latest row
-df = pd.read_csv('data/combined_features.csv', index_col=0, parse_dates=True)
-df = add_price_features(df)
-df = merge_cot_data(df)
-df = merge_weather_data(df)
-df = merge_enso_data(df)
-# Forward-fill remaining NaN (ENSO monthly data may lag) then drop only rows still missing
-df = df.ffill()
-df = df.dropna()
+    # Write the prediction script to a temp file to avoid f-string escaping issues
+    script_path = project_dir / "_dashboard_predict.py"
+    script_content = '''
+import json, sys, os, joblib, pandas as pd
+sys.path.insert(0, '.')
+sys.path.insert(0, '..')
+from features import prepare_dataset
+
+PRICE_COL = sys.argv[1]
+
+# Use prepare_dataset with a dummy horizon, then drop the target cols
+df, _ = prepare_dataset(horizon=5)
+# Drop target columns since we just want features
+for col in ['target_return', 'target_direction']:
+    if col in df.columns:
+        df = df.drop(columns=[col])
 
 models_dir = 'models'
+is_ensemble = False
+meta = None
 for meta_file in ['ensemble_metadata.json', 'v2_production_metadata.json', 'production_metadata.json']:
-    try:
-        with open(f'{{models_dir}}/{{meta_file}}') as f:
+    path = os.path.join(models_dir, meta_file)
+    if os.path.exists(path):
+        with open(path) as f:
             meta = json.load(f)
+        is_ensemble = 'ensemble' in meta_file
         break
-    except FileNotFoundError:
-        continue
-else:
-    print(json.dumps({{"error": "no metadata"}}))
+
+if meta is None:
+    print(json.dumps({"error": "no metadata"}))
     sys.exit(0)
 
-version = 'v2' if 'v2' in meta_file else 'v1'
-reg_file = f'{{models_dir}}/v2_production_regressor.joblib' if version == 'v2' else f'{{models_dir}}/production_regressor.joblib'
-clf_file = f'{{models_dir}}/v2_production_classifier.joblib' if version == 'v2' else f'{{models_dir}}/production_classifier.joblib'
+current_price = float(df.iloc[-1][PRICE_COL])
+as_of = df.index[-1].strftime('%Y-%m-%d')
 
-reg = joblib.load(reg_file)
-clf = joblib.load(clf_file)
-available = [f for f in meta['features'] if f in df.columns]
+if is_ensemble and 'models' in meta:
+    models_list = meta['models']
+    best = max(models_list, key=lambda x: x.get('avg_dir_acc', 0))
+    best_h = best['horizon']
+    best_type = best['model_type']
+    features = best['features']
+    available = [f for f in features if f in df.columns]
 
-latest = df.iloc[[-1]]
-X = latest[available].values
+    reg_file = os.path.join(models_dir, f'ensemble_reg_{best_h}d_{best_type}.joblib')
+    clf_file = os.path.join(models_dir, f'ensemble_clf_{best_h}d_{best_type}.joblib')
+    if not os.path.exists(reg_file):
+        reg_file = os.path.join(models_dir, f'ensemble_reg_{best_h}d.joblib')
+        clf_file = os.path.join(models_dir, f'ensemble_clf_{best_h}d.joblib')
 
-pred_return = float(reg.predict(X)[0])
-pred_dir = int(clf.predict(X)[0])
-pred_proba = clf.predict_proba(X)[0]
-confidence = float(pred_proba[pred_dir])
-current_price = float(latest['{price_col}'].values[0])
-as_of = latest.index[0].strftime('%Y-%m-%d')
+    reg = joblib.load(reg_file)
+    clf = joblib.load(clf_file)
+    X = df.iloc[[-1]][available].values
+    pred_return = float(reg.predict(X)[0])
+    pred_dir = int(clf.predict(X)[0])
+    pred_proba = clf.predict_proba(X)[0]
+    confidence = float(pred_proba[pred_dir])
 
-result = {{
-    'version': version, 'as_of': as_of,
-    'current_price': current_price,
-    'pred_return': pred_return, 'pred_dir': pred_dir,
-    'confidence': confidence,
-    'clf_accuracy': meta['classification']['avg_accuracy'],
-    'reg_accuracy': meta['regression']['avg_accuracy'],
-    'fold_accuracies': meta['classification']['fold_accuracies'],
-    'n_features': len(available),
-    'strategy_cfg': meta.get('strategy', {{'confidence_threshold': 0.70, 'stop_loss_pct': 0.10}}),
-}}
+    # Agreement: check all models
+    n_agree = 0
+    n_total = 0
+    for m_meta in models_list:
+        m_features = [f for f in m_meta['features'] if f in df.columns]
+        if len(m_features) < len(m_meta['features']):
+            continue
+        try:
+            mf = os.path.join(models_dir, f"ensemble_clf_{m_meta['horizon']}d_{m_meta['model_type']}.joblib")
+            m_clf = joblib.load(mf)
+            m_X = df.iloc[[-1]][m_features].values
+            m_dir = int(m_clf.predict(m_X)[0])
+            n_total += 1
+            if m_dir == pred_dir:
+                n_agree += 1
+        except Exception:
+            pass
+
+    agreement = n_agree / n_total if n_total > 0 else 0.5
+    best_acc = best.get('avg_dir_acc', 0)
+    n_models = meta.get('n_models', len(models_list))
+
+    result = {
+        'version': f'ensemble ({best_h}d {best_type})', 'as_of': as_of,
+        'current_price': current_price,
+        'pred_return': pred_return, 'pred_dir': pred_dir,
+        'confidence': confidence,
+        'clf_accuracy': best_acc, 'reg_accuracy': best_acc,
+        'fold_accuracies': [],
+        'n_features': len(available),
+        'strategy_cfg': meta.get('strategy', {'confidence_threshold': 0.70, 'stop_loss_pct': 0.10}),
+        'ensemble': True, 'n_models': n_models,
+        'best_model': f'{best_h}d {best_type}',
+        'agreement': agreement, 'horizon': best_h,
+    }
+else:
+    version = 'v2' if 'v2' in (meta_file if 'meta_file' in dir() else '') else 'v1'
+    reg_name = 'v2_production_regressor.joblib' if version == 'v2' else 'production_regressor.joblib'
+    clf_name = 'v2_production_classifier.joblib' if version == 'v2' else 'production_classifier.joblib'
+    reg = joblib.load(os.path.join(models_dir, reg_name))
+    clf = joblib.load(os.path.join(models_dir, clf_name))
+    available = [f for f in meta.get('features', []) if f in df.columns]
+    X = df.iloc[[-1]][available].values
+    pred_return = float(reg.predict(X)[0])
+    pred_dir = int(clf.predict(X)[0])
+    pred_proba = clf.predict_proba(X)[0]
+    confidence = float(pred_proba[pred_dir])
+
+    result = {
+        'version': version, 'as_of': as_of,
+        'current_price': current_price,
+        'pred_return': pred_return, 'pred_dir': pred_dir,
+        'confidence': confidence,
+        'clf_accuracy': meta.get('classification', {}).get('avg_accuracy', 0),
+        'reg_accuracy': meta.get('regression', {}).get('avg_accuracy', 0),
+        'fold_accuracies': meta.get('classification', {}).get('fold_accuracies', []),
+        'n_features': len(available),
+        'strategy_cfg': meta.get('strategy', {'confidence_threshold': 0.70, 'stop_loss_pct': 0.10}),
+        'ensemble': False, 'n_models': 1,
+        'horizon': meta.get('horizon', 63),
+    }
+
 print(json.dumps(result))
-"""
-    result = subprocess.run(
-        [sys.executable, "-c", script],
-        capture_output=True, text=True, cwd=str(project_dir), timeout=120,
-    )
-    if result.returncode != 0:
-        return None
+'''
+    script_path.write_text(script_content)
+
     try:
+        result = subprocess.run(
+            [sys.executable, str(script_path), price_col],
+            capture_output=True, text=True, cwd=str(project_dir), timeout=120,
+        )
+        if result.returncode != 0:
+            return None
         return json.loads(result.stdout.strip().split("\n")[-1])
-    except (json.JSONDecodeError, IndexError):
+    except (subprocess.TimeoutExpired, json.JSONDecodeError, IndexError):
         return None
+    finally:
+        script_path.unlink(missing_ok=True)
 
 
 def load_commodity(project_dir: Path, commodity_name: str, ticker: str, price_col: str, color: str):
@@ -111,7 +179,8 @@ def load_commodity(project_dir: Path, commodity_name: str, ticker: str, price_co
     predicted_price = current_price * (1 + pred_return)
     as_of_date = raw["as_of"]
     as_of_dt = datetime.strptime(as_of_date, "%Y-%m-%d")
-    target_date = (as_of_dt + timedelta(days=90)).strftime("%Y-%m-%d")
+    horizon_days = raw.get("horizon", 63)
+    target_date = (as_of_dt + timedelta(days=int(horizon_days * 1.4))).strftime("%Y-%m-%d")
 
     # Data staleness
     data_age_days = (datetime.now() - as_of_dt).days
@@ -166,6 +235,9 @@ def load_commodity(project_dir: Path, commodity_name: str, ticker: str, price_co
         with open(strat_file) as f:
             backtest = json.load(f).get("metrics")
 
+    horizon = raw.get("horizon", 63)
+    is_ensemble = raw.get("ensemble", False)
+
     return {
         "name": commodity_name, "ticker": ticker, "color": color, "version": version,
         "as_of_date": as_of_date, "is_stale": is_stale, "data_age_days": data_age_days,
@@ -175,12 +247,17 @@ def load_commodity(project_dir: Path, commodity_name: str, ticker: str, price_co
         "confidence": confidence,
         "clf_accuracy": raw["clf_accuracy"],
         "reg_accuracy": raw["reg_accuracy"],
-        "fold_accuracies": raw["fold_accuracies"],
+        "fold_accuracies": raw.get("fold_accuracies", []),
         "n_features": raw["n_features"],
         "strategy": strategy,
         "backtest": backtest,
         "equity_plays": equity_plays,
         "price_dates": price_dates, "price_values": price_values,
+        "horizon": horizon,
+        "is_ensemble": is_ensemble,
+        "n_models": raw.get("n_models", 1),
+        "best_model": raw.get("best_model", ""),
+        "agreement": raw.get("agreement", 0),
     }
 
 
@@ -313,8 +390,8 @@ TEMPLATE = """
 <div class="container">
     <header>
         <h1>Commodities Dashboard</h1>
-        <span class="tag">63-Day Horizon</span>
-        <span class="tag">Weekly Check</span>
+        <span class="tag">Multi-Horizon Ensemble</span>
+        <span class="tag">XGBoost + LightGBM + Ridge</span>
     </header>
 
     {% for c in commodities %}
@@ -333,7 +410,8 @@ TEMPLATE = """
                 <div>
                     <span class="panel-title">{{ c.name }}</span>
                     <span class="tag" style="margin-left:8px">{{ c.ticker }}</span>
-                    <span class="tag">{{ c.version }}</span>
+                    <span class="tag">{{ c.horizon }}d</span>
+                    {% if c.is_ensemble %}<span class="tag">{{ c.n_models }} models</span>{% endif %}
                 </div>
                 <span class="signal-badge {{ 'signal-up' if c.strategy.action == 'LONG' else ('signal-down' if c.strategy.action == 'SHORT' else 'signal-none') }}">
                     {{ c.strategy.action }}
@@ -346,7 +424,7 @@ TEMPLATE = """
                     <div class="current-price">${{ "%.2f"|format(c.current_price) }}</div>
                 </div>
                 <div style="text-align:right">
-                    <div style="font-size:12px; color:#71717a">Predicted (~3mo)</div>
+                    <div style="font-size:12px; color:#71717a">Predicted ({{ c.horizon }}d)</div>
                     <div class="pred-price {{ 'up' if c.direction == 'UP' else 'down' }}">
                         ${{ "%.2f"|format(c.predicted_price) }}
                         <span style="font-size:13px">({{ "%+.1f"|format(c.predicted_return * 100) }}%)</span>
@@ -360,14 +438,24 @@ TEMPLATE = """
                     <div class="stat-label">Confidence</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-val {{ 'up' if c.clf_accuracy > 0.6 else 'neutral' }}">{{ "%.0f"|format(c.clf_accuracy * 100) }}%</div>
-                    <div class="stat-label">Model Accuracy</div>
+                    <div class="stat-val {{ 'up' if c.clf_accuracy >= 0.70 else ('neutral' if c.clf_accuracy >= 0.60 else 'down') }}">{{ "%.0f"|format(c.clf_accuracy * 100) }}%</div>
+                    <div class="stat-label">Best Model Acc</div>
                 </div>
+                {% if c.is_ensemble %}
+                <div class="stat">
+                    <div class="stat-val {{ 'up' if c.agreement >= 0.7 else 'neutral' }}">{{ "%.0f"|format(c.agreement * 100) }}%</div>
+                    <div class="stat-label">Agreement</div>
+                </div>
+                {% else %}
                 <div class="stat">
                     <div class="stat-val">{{ c.n_features }}</div>
                     <div class="stat-label">Features</div>
                 </div>
+                {% endif %}
             </div>
+            {% if c.is_ensemble and c.best_model %}
+            <div style="font-size:11px; color:#71717a; text-align:center; margin-bottom:8px">Best: {{ c.best_model }}</div>
+            {% endif %}
 
             {% if c.strategy.action != "NO TRADE" %}
             <div class="strategy-box">
