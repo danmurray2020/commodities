@@ -20,6 +20,7 @@ Usage:
     python -m agents data-quality [commodities...]  # Data Quality Agent (validate data)
     python -m agents quality [commodities...]     # Model Quality Agent (diagnose + fix)
     python -m agents baselines [commodities...]   # Baseline Benchmark Agent
+    python -m agents confidence [commodities...]  # Confidence Calibration Meta-Model
     python -m agents weekly [commodities...]      # Full weekly pipeline
     python -m agents health                       # Quick health check
 """
@@ -95,6 +96,9 @@ def main():
         run()
     elif command == "calibration":
         from .calibration import main as run
+        run()
+    elif command == "confidence":
+        from .confidence_model import main as run
         run()
     elif command in ("weekly", "run"):
         from .orchestrator import main as run

@@ -71,16 +71,76 @@ COMMODITIES = {
         dir_name="copper", confidence_threshold=0.75, model_version="v5",
         horizon=63,
     ),
+    # Energy
+    "crude_oil": CommodityConfig(
+        name="Crude Oil", ticker="CL=F", price_col="crude_oil_close",
+        dir_name="crude_oil", confidence_threshold=0.70,
+    ),
+    "heating_oil": CommodityConfig(
+        name="Heating Oil", ticker="HO=F", price_col="heating_oil_close",
+        dir_name="heating_oil", confidence_threshold=0.70,
+    ),
+    "gasoline": CommodityConfig(
+        name="Gasoline", ticker="RB=F", price_col="gasoline_close",
+        dir_name="gasoline", confidence_threshold=0.70,
+    ),
+    # Precious metals
+    "gold": CommodityConfig(
+        name="Gold", ticker="GC=F", price_col="gold_close",
+        dir_name="gold", confidence_threshold=0.70,
+    ),
+    "silver": CommodityConfig(
+        name="Silver", ticker="SI=F", price_col="silver_close",
+        dir_name="silver", confidence_threshold=0.70,
+    ),
+    "platinum": CommodityConfig(
+        name="Platinum", ticker="PL=F", price_col="platinum_close",
+        dir_name="platinum", confidence_threshold=0.70,
+    ),
+    # Grains
+    "corn": CommodityConfig(
+        name="Corn", ticker="ZC=F", price_col="corn_close",
+        dir_name="corn", confidence_threshold=0.70,
+    ),
+    "oats": CommodityConfig(
+        name="Oats", ticker="ZO=F", price_col="oats_close",
+        dir_name="oats", confidence_threshold=0.70,
+    ),
+    # Livestock
+    "live_cattle": CommodityConfig(
+        name="Live Cattle", ticker="LE=F", price_col="cattle_close",
+        dir_name="live_cattle", confidence_threshold=0.70,
+    ),
+    "lean_hogs": CommodityConfig(
+        name="Lean Hogs", ticker="HE=F", price_col="hogs_close",
+        dir_name="lean_hogs", confidence_threshold=0.70,
+    ),
+    # Softs
+    "cotton": CommodityConfig(
+        name="Cotton", ticker="CT=F", price_col="cotton_close",
+        dir_name="cotton", confidence_threshold=0.70,
+    ),
+    "lumber": CommodityConfig(
+        name="Lumber", ticker="LBS=F", price_col="lumber_close",
+        dir_name="lumber", confidence_threshold=0.70,
+    ),
+    "oj": CommodityConfig(
+        name="Orange Juice", ticker="OJ=F", price_col="oj_close",
+        dir_name="oj", confidence_threshold=0.70,
+    ),
 }
 
 
 # ── Correlation groups for risk management ─────────────────────────────
 CORRELATION_GROUPS = {
-    "brazil_soft": ["coffee", "sugar"],
-    "grains": ["soybeans", "wheat"],
-    "energy": ["natgas"],
+    "brazil_soft": ["coffee", "sugar", "oj"],
+    "grains": ["soybeans", "wheat", "corn", "oats"],
+    "energy": ["natgas", "crude_oil", "heating_oil", "gasoline"],
+    "precious": ["gold", "silver", "platinum"],
     "industrial": ["copper"],
     "tropical": ["cocoa"],
+    "livestock": ["live_cattle", "lean_hogs"],
+    "fiber": ["cotton", "lumber"],
 }
 
 

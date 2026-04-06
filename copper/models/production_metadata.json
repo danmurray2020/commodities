@@ -3,22 +3,37 @@
   "ticker": "HG=F",
   "horizon": 63,
   "features": [
+    "macd_diff",
+    "season_sin_1",
+    "month",
     "sma_5",
-    "price_vs_sma_50",
-    "price_lag_3",
-    "price_vs_sma_5",
-    "return_10d",
-    "rsi_14",
-    "bb_pct",
-    "price_vs_sma_10",
-    "sma_200",
     "cny_return_21d",
+    "return_10d",
+    "price_vs_sma_50",
+    "macd",
     "price_vs_sma_200",
+    "price_vs_sma_10",
+    "momentum_rank_252d",
+    "cot_oi_change",
+    "mei_change_3m",
+    "cot_spec_ratio",
+    "trend_slope_63d",
     "cot_noncomm_long_chg",
+    "cot_comm_short",
+    "season_cos_1",
+    "zscore_252d_change_21d",
     "crude_oil",
-    "macd"
+    "return_21d",
+    "trend_slope_126d",
+    "chile_precip_30d_sum",
+    "season_cos_2",
+    "chile_precip_7d_sum",
+    "sma_50_200_gap",
+    "oni_change_3m",
+    "usd_index",
+    "zscore_252d"
   ],
-  "n_features": 14,
+  "n_features": 29,
   "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.7,
@@ -29,48 +44,70 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 391,
-      "max_depth": 8,
-      "learning_rate": 0.028143047682228972,
-      "subsample": 0.9761548677844252,
-      "colsample_bytree": 0.9838488877345699,
-      "min_child_weight": 1,
-      "gamma": 0.04299072654913666,
-      "reg_alpha": 5.272752324964821e-05,
-      "reg_lambda": 1.0269169248159744e-08,
-      "max_delta_step": 2.4969331380440405
+      "n_estimators": 593,
+      "max_depth": 4,
+      "learning_rate": 0.1639131880105062,
+      "subsample": 0.8588809919516601,
+      "colsample_bytree": 0.9989038054225934,
+      "min_child_weight": 15,
+      "gamma": 1.4055258544874476,
+      "reg_alpha": 4.128658669847214e-07,
+      "reg_lambda": 0.00010978040380611437,
+      "max_delta_step": 2.708193314652731
     },
     "fold_accuracies": [
-      0.7619047619047619,
-      0.9206349206349206,
-      0.7777777777777778,
+      0.6984126984126984,
+      0.7936507936507936,
       0.7142857142857143,
+      0.9047619047619048,
       0.8888888888888888
     ],
-    "avg_accuracy": 0.8126984126984127,
-    "std_accuracy": 0.07866356630707215
+    "avg_accuracy": 0.8,
+    "std_accuracy": 0.0855377370495713,
+    "fold_maes": [
+      0.04403562498956829,
+      0.0885597651811799,
+      0.12206987057804927,
+      0.10549950876296182,
+      0.009413190791690784
+    ],
+    "fold_rmses": [
+      0.05745800337418516,
+      0.11486605672028138,
+      0.12576144524999902,
+      0.1177460838153438,
+      0.01033082354742123
+    ],
+    "avg_mae": 0.07391559206069001,
+    "avg_rmse": 0.08523248254144611
   },
   "classification": {
     "params": {
-      "n_estimators": 164,
-      "max_depth": 2,
-      "learning_rate": 0.009663077757924004,
-      "subsample": 0.5558827197742564,
-      "colsample_bytree": 0.8860856695280798,
-      "min_child_weight": 14,
-      "gamma": 9.844124039439743,
-      "reg_alpha": 2.266937521407564e-06,
-      "reg_lambda": 47.266159326007894,
-      "max_delta_step": 3.830029586027719
+      "n_estimators": 178,
+      "max_depth": 10,
+      "learning_rate": 0.15280908710208643,
+      "subsample": 0.753170395688322,
+      "colsample_bytree": 0.34741711796332586,
+      "min_child_weight": 21,
+      "gamma": 0.48268684876001433,
+      "reg_alpha": 6.933496439960888e-08,
+      "reg_lambda": 7.43369403017513,
+      "max_delta_step": 0.16293609427425873
     },
     "fold_accuracies": [
-      0.7777777777777778,
+      0.6507936507936508,
       0.6984126984126984,
-      0.8095238095238095,
-      0.9841269841269841,
-      0.8888888888888888
+      0.8888888888888888,
+      0.6349206349206349,
+      0.9841269841269841
     ],
-    "avg_accuracy": 0.8317460317460317,
-    "std_accuracy": 0.09764162856653776
+    "avg_accuracy": 0.7714285714285715,
+    "std_accuracy": 0.13968253968253966
+  },
+  "holdout": {
+    "size": 126,
+    "reg_direction_accuracy": 0.8968253968253969,
+    "reg_mae": 0.05739430307171418,
+    "clf_accuracy": 0.8015873015873016
   }
 }
