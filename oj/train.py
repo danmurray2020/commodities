@@ -92,7 +92,9 @@ def main():
     selected = select_features(df, all_feature_cols, selection_splits)
 
     print("\nFiltering for feature stability...")
-    stable_features, stability_diag = filter_stable_features(df, selected)
+    stable_features, stability_diag = filter_stable_features(
+        df, selected, train_end=int(selection_splits[0][1][0]) if selection_splits else None
+    )
     n_dropped = len(selected) - len(stable_features)
     if n_dropped > 0:
         dropped = [d["feature"] for d in stability_diag if not d["stable"]]

@@ -208,8 +208,9 @@ def simulate_portfolio(config: PortfolioConfig = None, start_date: str = None) -
             "accuracy": info["accuracy"],
         })
 
-    # Treasury yield on idle cash
-    sim_years = 2.25  # approx period
+    # Treasury yield on idle cash — compute actual duration from start_date
+    sim_start = datetime.strptime(start_date or "2024-01-01", "%Y-%m-%d")
+    sim_years = max((datetime.now() - sim_start).days / 365.25, 0.01)
     treasury_income = cash_alloc * config.treasury_rate * sim_years
 
     # Print results

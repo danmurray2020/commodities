@@ -133,8 +133,7 @@ def diagnose_commodity(cfg: CommodityConfig) -> dict:
 
     # ── Load history to avoid repeating failed strategies ──
 
-    key = cfg.dir_name if cfg.dir_name != "chocolate" else "cocoa"
-    # Try matching on commodity name in lowercase
+    key = cfg.dir_name
     for k, c in COMMODITIES.items():
         if c.name == cfg.name:
             key = k

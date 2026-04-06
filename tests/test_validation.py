@@ -10,7 +10,7 @@ from unittest.mock import patch, MagicMock
 from dataclasses import dataclass
 
 import sys
-sys.path.insert(0, str(Path("/Users/danielmurray/dev2/commodities")))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from agents.config import CommodityConfig
 from agents.validation import check_fold_variance, validate_features

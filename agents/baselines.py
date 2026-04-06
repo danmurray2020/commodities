@@ -84,7 +84,6 @@ buyhold_acc = float(np.mean(buyhold_preds == true_dirs))
 # For each holdout point, look at the return over the previous horizon days
 persistence_preds = []
 for idx in indices:
-    row_pos = holdout_size - holdout_size + idx  # position within holdout
     abs_pos = len(df) - holdout_size + idx        # absolute position in df
     if abs_pos >= horizon:
         past_return = df[price_col].iloc[abs_pos] / df[price_col].iloc[abs_pos - horizon] - 1

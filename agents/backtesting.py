@@ -92,6 +92,9 @@ except Exception as e:
             return None
         data["commodity"] = cfg.name
         return data
+    except (json.JSONDecodeError, IndexError) as e:
+        logger.error(f"{cfg.name} backtest output parsing failed: {e}")
+        return None
     except Exception as e:
         logger.error(f"{cfg.name} backtest exception: {e}")
         return None
@@ -143,6 +146,9 @@ print(json.dumps(results))
             return None
         data = json.loads(result.stdout.strip().split("\n")[-1])
         return {"commodity": cfg.name, "sweep_results": data}
+    except (json.JSONDecodeError, IndexError) as e:
+        logger.error(f"{cfg.name} sweep output parsing failed: {e}")
+        return None
     except Exception as e:
         logger.error(f"{cfg.name} sweep failed: {e}")
         return None

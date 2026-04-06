@@ -362,12 +362,12 @@ def _compute_metrics(strategy_name: str, trades: list, equity: list, config: Vol
     avg_hold = np.mean([t["hold"] for t in trades])
 
     gross_profit = sum(t["pnl_dollars"] for t in wins) if wins else 0
-    gross_loss = abs(sum(t["pnl_dollars"] for t in losses)) if losses else 0.01
-    profit_factor = gross_profit / gross_loss
+    gross_loss = abs(sum(t["pnl_dollars"] for t in losses)) if losses else 0
+    profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf") if gross_profit > 0 else 0
 
     eq = np.array(equity) if equity else np.array([config.initial_capital])
     peak = np.maximum.accumulate(eq)
-    dd = (eq - peak) / peak
+    dd = (eq - peak) / np.maximum(peak, 1e-10)
     max_dd = float(np.min(dd)) if len(dd) > 0 else 0
 
     if len(eq) > 1:

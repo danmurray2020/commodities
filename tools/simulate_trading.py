@@ -313,9 +313,10 @@ print(json.dumps({{"rows": len(df), "cols": len(df.columns)}}))
         equity_curve.append(total_equity)
         daily_dates.append(current_date)
 
-    # Force close remaining positions
+    # Force close remaining positions (with slippage, same as normal exits)
     for pos in positions:
-        final_price = prices[-1]
+        raw_price = prices[-1]
+        final_price = raw_price * (1 + config.slippage_pct * (-1 if pos.direction == "LONG" else 1))
         if pos.direction == "LONG":
             pnl = (final_price - pos.entry_price) / pos.entry_price
         else:
@@ -344,7 +345,7 @@ print(json.dumps({{"rows": len(df), "cols": len(df.columns)}}))
     equity = np.array(equity_curve)
     if len(equity) > 1:
         peak = np.maximum.accumulate(equity)
-        drawdown = (equity - peak) / peak
+        drawdown = (equity - peak) / np.maximum(peak, 1e-10)
         max_dd = float(np.min(drawdown))
         daily_returns = np.diff(equity) / equity[:-1]
         sharpe = float(np.mean(daily_returns) / np.std(daily_returns) * np.sqrt(252)) if np.std(daily_returns) > 0 else 0
@@ -353,8 +354,8 @@ print(json.dumps({{"rows": len(df), "cols": len(df.columns)}}))
         sharpe = 0
 
     gross_profit = sum(t.pnl_dollars for t in wins) if wins else 0
-    gross_loss = abs(sum(t.pnl_dollars for t in losses)) if losses else 0.01
-    profit_factor = gross_profit / gross_loss if gross_loss > 0 else 0
+    gross_loss = abs(sum(t.pnl_dollars for t in losses)) if losses else 0
+    profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf") if gross_profit > 0 else 0
 
     return {
         "commodity": cfg.name,

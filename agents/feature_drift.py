@@ -93,7 +93,7 @@ def check_drift_commodity(cfg: CommodityConfig) -> dict:
         return result
 
     # Split into training and recent windows
-    # Training: all data except last 126 days
+    # Training: all data except last 63 days (contiguous with recent window)
     # Recent: last 63 days
     if len(df) < 126:
         result["status"] = "insufficient_data"
@@ -101,7 +101,7 @@ def check_drift_commodity(cfg: CommodityConfig) -> dict:
         logger.warning(result["summary"])
         return result
 
-    train_df = df.iloc[:-126]
+    train_df = df.iloc[:-63]
     recent_df = df.iloc[-63:]
 
     drifted = []

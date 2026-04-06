@@ -150,22 +150,28 @@ def get_signals(
 def get_active_signals(commodity: str = None, signal_type: str = None) -> list[dict]:
     """Get unresolved signals for a commodity.
 
-    Returns signals that haven't been followed by a resolution entry.
+    Returns signals emitted *after* the most recent resolution for that
+    (type, commodity) pair.  Earlier signals — whether resolved explicitly
+    or simply preceding a resolution entry — are excluded.
     """
     all_signals = get_signals(commodity=commodity, signal_type=signal_type)
 
-    # Track resolutions
-    resolved = set()
+    # Find the latest resolution timestamp per (type, commodity)
+    latest_resolution: dict[tuple, str] = {}
     for s in all_signals:
         if s.get("resolved"):
-            resolved.add((s.get("type"), s.get("commodity")))
+            key = (s.get("type"), s.get("commodity"))
+            ts = s.get("timestamp", "")
+            if ts > latest_resolution.get(key, ""):
+                latest_resolution[key] = ts
 
-    # Return unresolved
+    # Return unresolved signals emitted after the latest resolution
     active = []
     for s in all_signals:
         if not s.get("resolved"):
             key = (s.get("type"), s.get("commodity"))
-            if key not in resolved:
+            resolution_ts = latest_resolution.get(key, "")
+            if s.get("timestamp", "") > resolution_ts:
                 active.append(s)
 
     return active

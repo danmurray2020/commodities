@@ -64,15 +64,16 @@ def train_single_horizon(
     # Non-overlapping test size: enough for ~8 independent obs per fold
     test_size = max(horizon * 10, 126)  # at least 10 non-overlapping per fold
 
-    # Feature stability filter
-    stable, _ = filter_stable_features(df, all_feature_cols)
-    if len(stable) < 5:
-        stable = all_feature_cols[:max(15, len(all_feature_cols) // 3)]
-
     # Feature selection via permutation importance
     selection_splits = walk_forward_split(
         df, n_splits=3, test_size=test_size, purge_gap=horizon
     )
+
+    # Feature stability filter (use only training data to avoid leakage)
+    train_end = int(selection_splits[0][1][0]) if selection_splits else None
+    stable, _ = filter_stable_features(df, all_feature_cols, train_end=train_end)
+    if len(stable) < 5:
+        stable = all_feature_cols[:max(15, len(all_feature_cols) // 3)]
 
     if len(selection_splits) < 2:
         # Not enough data for feature selection at this horizon
@@ -258,13 +259,14 @@ def train_multi_model_horizon(
 
     test_size = max(horizon * 10, 126)
 
-    # Feature stability filter
-    stable, _ = filter_stable_features(df, all_feature_cols)
-    if len(stable) < 5:
-        stable = all_feature_cols[:max(15, len(all_feature_cols) // 3)]
-
     # Feature selection
     selection_splits = walk_forward_split(df, n_splits=3, test_size=test_size, purge_gap=horizon)
+
+    # Feature stability filter (use only training data to avoid leakage)
+    train_end = int(selection_splits[0][1][0]) if selection_splits else None
+    stable, _ = filter_stable_features(df, all_feature_cols, train_end=train_end)
+    if len(stable) < 5:
+        stable = all_feature_cols[:max(15, len(all_feature_cols) // 3)]
     if len(selection_splits) < 2:
         feature_cols = stable[:20]
     else:

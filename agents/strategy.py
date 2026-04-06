@@ -159,16 +159,21 @@ def main():
         print("No predictions log found. Run the prediction agent first.")
         return
 
+    # Build name-to-key mapping once (handles "Natural Gas" -> "natgas", etc.)
+    name_to_key = {}
+    for k, cfg in COMMODITIES.items():
+        name_to_key[k] = k  # key itself
+        name_to_key[cfg.name.lower().replace(" ", "")] = k
+        name_to_key[cfg.dir_name.lower().replace(" ", "")] = k
+
     # Load latest prediction per commodity
     latest = {}
     with open(predictions_log) as f:
         for line in f:
             try:
                 entry = json.loads(line)
-                key = entry.get("commodity", "").lower().replace(" ", "")
-                # Map names back to keys
-                name_to_key = {cfg.name.lower().replace(" ", ""): k for k, cfg in COMMODITIES.items()}
-                resolved = name_to_key.get(key, key)
+                raw = entry.get("commodity", "").lower().replace(" ", "")
+                resolved = name_to_key.get(raw, raw)
                 latest[resolved] = entry
             except json.JSONDecodeError:
                 continue

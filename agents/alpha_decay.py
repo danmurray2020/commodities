@@ -82,7 +82,7 @@ def measure_alpha_decay(cfg: CommodityConfig, windows: list[int] = None) -> dict
 
             realized_price = float(price.loc[mask].iloc[0])
             entry_price = pred["price"]
-            realized_dir = "UP" if realized_price > entry_price else "DOWN"
+            realized_dir = "UP" if realized_price >= entry_price else "DOWN"
             predicted_dir = pred["direction"]
 
             if realized_dir == predicted_dir:

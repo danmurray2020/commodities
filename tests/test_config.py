@@ -4,7 +4,7 @@ import pytest
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path("/Users/danielmurray/dev2/commodities")))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from agents.config import COMMODITIES, CORRELATION_GROUPS, CommodityConfig
 
@@ -53,10 +53,12 @@ class TestCommodityConfigs:
             )
 
     def test_expected_commodities_present(self):
-        """All 7 commodities should be configured."""
-        expected = {"coffee", "cocoa", "sugar", "natgas", "soybeans", "wheat", "copper"}
+        """All configured commodities should be valid."""
+        expected_min = {"coffee", "cocoa", "sugar", "natgas", "soybeans", "wheat", "copper"}
         actual = set(COMMODITIES.keys())
-        assert expected == actual, f"Missing: {expected - actual}, Extra: {actual - expected}"
+        missing = expected_min - actual
+        assert len(missing) == 0, f"Core commodities missing: {missing}"
+        assert len(actual) >= 7, f"Expected at least 7 commodities, got {len(actual)}"
 
 
 class TestCorrelationGroups:

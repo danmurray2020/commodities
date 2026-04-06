@@ -142,10 +142,10 @@ def check_regime_shift(cfg: CommodityConfig, window: int = 63) -> dict:
     annual_return = float((price.iloc[-1] / price.iloc[-252] - 1)) if len(price) >= 252 else None
 
     regime = "normal"
-    if vol_ratio > 1.5:
-        regime = "high_volatility"
-    elif vol_ratio > 2.0:
+    if vol_ratio > 2.0:
         regime = "extreme_volatility"
+    elif vol_ratio > 1.5:
+        regime = "high_volatility"
 
     return {
         "regime": regime,

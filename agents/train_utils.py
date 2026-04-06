@@ -74,9 +74,12 @@ def walk_forward_split(
     splits = []
     for i in range(n_splits):
         test_end = n - i * test_size
+        # Ensure test targets (which look `purge_gap` days ahead) don't exceed data
+        if test_end + purge_gap > n:
+            test_end = n - purge_gap
         test_start = test_end - test_size
         train_end = test_start - purge_gap
-        if train_end < min_train_size:
+        if train_end < min_train_size or test_start < 0:
             break
         train_idx = np.arange(0, train_end)
         test_idx = np.arange(test_start, test_end)
@@ -166,6 +169,7 @@ def filter_stable_features(
     feature_cols: list[str],
     target_col: str = "target_return",
     min_correlation_consistency: float = 0.0,
+    train_end: int | None = None,
 ) -> tuple[list[str], list[dict]]:
     """Remove features whose correlation with target flips sign between halves.
 
@@ -178,13 +182,16 @@ def filter_stable_features(
         target_col: Target column name.
         min_correlation_consistency: Minimum threshold — features where
             corr_h1 * corr_h2 < this value are dropped.
+        train_end: If provided, only use rows up to this index for stability
+            analysis (prevents data leakage from test data).
 
     Returns:
         Tuple of (stable_features, diagnostics).
     """
-    midpoint = len(df) // 2
-    h1 = df.iloc[:midpoint]
-    h2 = df.iloc[midpoint:]
+    train_df = df.iloc[:train_end] if train_end is not None else df
+    midpoint = len(train_df) // 2
+    h1 = train_df.iloc[:midpoint]
+    h2 = train_df.iloc[midpoint:]
     target_h1 = h1[target_col]
     target_h2 = h2[target_col]
 
@@ -193,7 +200,7 @@ def filter_stable_features(
     diagnostics = []
 
     for feat in feature_cols:
-        if feat not in df.columns:
+        if feat not in train_df.columns:
             continue
 
         corr_h1 = h1[feat].corr(target_h1)
