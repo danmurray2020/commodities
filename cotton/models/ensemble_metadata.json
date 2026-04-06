@@ -1,0 +1,395 @@
+{
+  "commodity": "Cotton",
+  "ticker": "CT=F",
+  "trained_at": "2026-04-06T12:51:20.585391",
+  "models": [
+    {
+      "horizon": 5,
+      "model_type": "xgboost",
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "n_features": 10,
+      "weight": 0.854,
+      "avg_dir_acc": 0.5385,
+      "avg_clf_acc": 0.6
+    },
+    {
+      "horizon": 5,
+      "model_type": "lightgbm",
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "n_features": 10,
+      "weight": 1.0,
+      "avg_dir_acc": 0.6308,
+      "avg_clf_acc": 0.4615
+    },
+    {
+      "horizon": 5,
+      "model_type": "ridge",
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "n_features": 10,
+      "weight": 0.659,
+      "avg_dir_acc": 0.4154,
+      "avg_clf_acc": 0.5231
+    },
+    {
+      "horizon": 10,
+      "model_type": "xgboost",
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "n_features": 8,
+      "weight": 0.732,
+      "avg_dir_acc": 0.4615,
+      "avg_clf_acc": 0.5539
+    },
+    {
+      "horizon": 10,
+      "model_type": "lightgbm",
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "n_features": 8,
+      "weight": 0.927,
+      "avg_dir_acc": 0.5846,
+      "avg_clf_acc": 0.5385
+    },
+    {
+      "horizon": 10,
+      "model_type": "ridge",
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "n_features": 8,
+      "weight": 0.854,
+      "avg_dir_acc": 0.5385,
+      "avg_clf_acc": 0.5846
+    },
+    {
+      "horizon": 21,
+      "model_type": "xgboost",
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "n_features": 11,
+      "weight": 0.698,
+      "avg_dir_acc": 0.44,
+      "avg_clf_acc": 0.54
+    },
+    {
+      "horizon": 21,
+      "model_type": "lightgbm",
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "n_features": 11,
+      "weight": 0.92,
+      "avg_dir_acc": 0.58,
+      "avg_clf_acc": 0.54
+    },
+    {
+      "horizon": 21,
+      "model_type": "ridge",
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "n_features": 11,
+      "weight": 0.983,
+      "avg_dir_acc": 0.62,
+      "avg_clf_acc": 0.52
+    }
+  ],
+  "n_models": 9,
+  "best_model": "5d_lightgbm",
+  "best_accuracy": 0.6308,
+  "avg_accuracy": 0.5343666666666667,
+  "horizons": [
+    {
+      "horizon": 5,
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "weight": 0.854,
+      "metrics": {
+        "avg_dir_acc": 0.5385,
+        "avg_clf_acc": 0.6,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "weight": 1.0,
+      "metrics": {
+        "avg_dir_acc": 0.6308,
+        "avg_clf_acc": 0.4615,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "volatility_21d",
+        "trend_slope_126d",
+        "return_1d",
+        "macd_signal",
+        "vix",
+        "vol_regime_change",
+        "trend_slope_21d",
+        "sma_50_200_gap",
+        "sp500",
+        "us10y"
+      ],
+      "weight": 0.659,
+      "metrics": {
+        "avg_dir_acc": 0.4154,
+        "avg_clf_acc": 0.5231,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.732,
+      "metrics": {
+        "avg_dir_acc": 0.4615,
+        "avg_clf_acc": 0.5539,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.927,
+      "metrics": {
+        "avg_dir_acc": 0.5846,
+        "avg_clf_acc": 0.5385,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "trend_slope_126d",
+        "vix",
+        "us10y",
+        "macd",
+        "usd_index",
+        "price_vs_sma_50",
+        "return_21d",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.854,
+      "metrics": {
+        "avg_dir_acc": 0.5385,
+        "avg_clf_acc": 0.5846,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "weight": 0.698,
+      "metrics": {
+        "avg_dir_acc": 0.44,
+        "avg_clf_acc": 0.54,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "weight": 0.92,
+      "metrics": {
+        "avg_dir_acc": 0.58,
+        "avg_clf_acc": 0.54,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "sma_50",
+        "bb_low",
+        "sp500",
+        "sma_21",
+        "price_lag_1",
+        "sma_5",
+        "return_5d",
+        "zscore_252d_change_21d",
+        "usd_index",
+        "return_10d",
+        "extreme_low"
+      ],
+      "weight": 0.983,
+      "metrics": {
+        "avg_dir_acc": 0.62,
+        "avg_clf_acc": 0.52,
+        "avg_spearman": 0
+      }
+    }
+  ],
+  "features": [
+    "volatility_21d",
+    "trend_slope_126d",
+    "return_1d",
+    "macd_signal",
+    "vix",
+    "vol_regime_change",
+    "trend_slope_21d",
+    "sma_50_200_gap",
+    "sp500",
+    "us10y"
+  ],
+  "horizon": 5,
+  "regression": {
+    "avg_accuracy": 0.5343666666666667
+  },
+  "classification": {
+    "avg_accuracy": 0.5401777777777776
+  }
+}

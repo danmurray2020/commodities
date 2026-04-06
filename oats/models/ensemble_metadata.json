@@ -1,0 +1,455 @@
+{
+  "commodity": "Oats",
+  "ticker": "ZO=F",
+  "trained_at": "2026-04-06T12:43:58.478912",
+  "models": [
+    {
+      "horizon": 5,
+      "model_type": "xgboost",
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "n_features": 16,
+      "weight": 0.798,
+      "avg_dir_acc": 0.5154,
+      "avg_clf_acc": 0.5231
+    },
+    {
+      "horizon": 5,
+      "model_type": "lightgbm",
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "n_features": 16,
+      "weight": 0.917,
+      "avg_dir_acc": 0.5923,
+      "avg_clf_acc": 0.5077
+    },
+    {
+      "horizon": 5,
+      "model_type": "ridge",
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "n_features": 16,
+      "weight": 0.845,
+      "avg_dir_acc": 0.5462,
+      "avg_clf_acc": 0.5539
+    },
+    {
+      "horizon": 10,
+      "model_type": "xgboost",
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "n_features": 10,
+      "weight": 0.762,
+      "avg_dir_acc": 0.4923,
+      "avg_clf_acc": 0.6
+    },
+    {
+      "horizon": 10,
+      "model_type": "lightgbm",
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "n_features": 10,
+      "weight": 1.0,
+      "avg_dir_acc": 0.6462,
+      "avg_clf_acc": 0.5385
+    },
+    {
+      "horizon": 10,
+      "model_type": "ridge",
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "n_features": 10,
+      "weight": 0.786,
+      "avg_dir_acc": 0.5077,
+      "avg_clf_acc": 0.4615
+    },
+    {
+      "horizon": 21,
+      "model_type": "xgboost",
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "n_features": 13,
+      "weight": 0.774,
+      "avg_dir_acc": 0.5,
+      "avg_clf_acc": 0.5
+    },
+    {
+      "horizon": 21,
+      "model_type": "lightgbm",
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "n_features": 13,
+      "weight": 0.805,
+      "avg_dir_acc": 0.52,
+      "avg_clf_acc": 0.5
+    },
+    {
+      "horizon": 21,
+      "model_type": "ridge",
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "n_features": 13,
+      "weight": 0.774,
+      "avg_dir_acc": 0.5,
+      "avg_clf_acc": 0.54
+    }
+  ],
+  "n_models": 9,
+  "best_model": "10d_lightgbm",
+  "best_accuracy": 0.6462,
+  "avg_accuracy": 0.5355666666666666,
+  "horizons": [
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "weight": 0.798,
+      "metrics": {
+        "avg_dir_acc": 0.5154,
+        "avg_clf_acc": 0.5231,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "weight": 0.917,
+      "metrics": {
+        "avg_dir_acc": 0.5923,
+        "avg_clf_acc": 0.5077,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_126d",
+        "bb_pct",
+        "zscore_252d_change_21d",
+        "trend_slope_126d",
+        "mean_reversion_pressure",
+        "return_10d",
+        "trend_slope_21d",
+        "trend_slope_63d",
+        "price_vs_sma_21",
+        "momentum_rank_252d",
+        "price_vs_sma_50",
+        "vol_regime_change",
+        "volatility_10d",
+        "return_21d",
+        "sp500",
+        "sma_50_200_gap"
+      ],
+      "weight": 0.845,
+      "metrics": {
+        "avg_dir_acc": 0.5462,
+        "avg_clf_acc": 0.5539,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "weight": 0.762,
+      "metrics": {
+        "avg_dir_acc": 0.4923,
+        "avg_clf_acc": 0.6,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "weight": 1.0,
+      "metrics": {
+        "avg_dir_acc": 0.6462,
+        "avg_clf_acc": 0.5385,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "pct_up_days_21d",
+        "trend_slope_63d",
+        "zscore_126d",
+        "drawdown_regime",
+        "trend_slope_126d",
+        "price_vs_sma_10",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_63d",
+        "pct_up_days_126d"
+      ],
+      "weight": 0.786,
+      "metrics": {
+        "avg_dir_acc": 0.5077,
+        "avg_clf_acc": 0.4615,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.774,
+      "metrics": {
+        "avg_dir_acc": 0.5,
+        "avg_clf_acc": 0.5,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.805,
+      "metrics": {
+        "avg_dir_acc": 0.52,
+        "avg_clf_acc": 0.5,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "pct_up_days_63d",
+        "momentum_rank_252d",
+        "pct_up_days_21d",
+        "zscore_126d",
+        "usd_index",
+        "sma_50_200_gap",
+        "price_vs_sma_50",
+        "return_10d",
+        "vol_regime_change",
+        "pct_up_days_126d",
+        "return_5d",
+        "regime_uncertainty",
+        "price_vs_sma_200"
+      ],
+      "weight": 0.774,
+      "metrics": {
+        "avg_dir_acc": 0.5,
+        "avg_clf_acc": 0.54,
+        "avg_spearman": 0
+      }
+    }
+  ],
+  "features": [
+    "pct_up_days_21d",
+    "trend_slope_63d",
+    "zscore_126d",
+    "drawdown_regime",
+    "trend_slope_126d",
+    "price_vs_sma_10",
+    "macd_diff",
+    "drawdown",
+    "pct_up_days_63d",
+    "pct_up_days_126d"
+  ],
+  "horizon": 10,
+  "regression": {
+    "avg_accuracy": 0.5355666666666666
+  },
+  "classification": {
+    "avg_accuracy": 0.5249666666666667
+  }
+}

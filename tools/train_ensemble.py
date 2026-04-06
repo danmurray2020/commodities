@@ -32,22 +32,14 @@ def train_commodity_ensemble(key: str) -> dict:
     script = f"""
 import json, sys, pandas as pd
 sys.path.insert(0, '.')
-from features import add_price_features, merge_cot_data, merge_weather_data, merge_enso_data
-
 sys.path.insert(0, '..')
-from agents.regime_features import add_regime_features
+from features import prepare_dataset
 
-df = pd.read_csv('data/combined_features.csv', index_col=0, parse_dates=True)
-df = add_price_features(df)
-df = add_regime_features(df, price_col='{cfg.price_col}')
-df = merge_cot_data(df)
-df = merge_weather_data(df)
-df = merge_enso_data(df)
-df = df.ffill()
-df = df.dropna()
-
-exclude = {{'{cfg.price_col}', 'Open', 'High', 'Low', 'Volume', 'target_return', 'target_direction'}}
-feature_cols = [c for c in df.columns if c not in exclude]
+df, feature_cols = prepare_dataset(horizon=5)
+# Drop target columns — ensemble rebuilds targets per horizon
+for col in ['target_return', 'target_direction']:
+    if col in df.columns:
+        df = df.drop(columns=[col])
 
 df.to_csv('/tmp/_ensemble_data_{key}.csv')
 with open('/tmp/_ensemble_features_{key}.json', 'w') as f:

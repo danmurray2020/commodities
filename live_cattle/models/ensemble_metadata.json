@@ -1,0 +1,458 @@
+{
+  "commodity": "Live Cattle",
+  "ticker": "LE=F",
+  "trained_at": "2026-04-06T12:55:26.174195",
+  "models": [
+    {
+      "horizon": 5,
+      "model_type": "xgboost",
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "n_features": 10,
+      "weight": 0.905,
+      "avg_dir_acc": 0.5846,
+      "avg_clf_acc": 0.6154
+    },
+    {
+      "horizon": 5,
+      "model_type": "lightgbm",
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "n_features": 10,
+      "weight": 0.94,
+      "avg_dir_acc": 0.6077,
+      "avg_clf_acc": 0.6
+    },
+    {
+      "horizon": 5,
+      "model_type": "ridge",
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "n_features": 10,
+      "weight": 0.845,
+      "avg_dir_acc": 0.5462,
+      "avg_clf_acc": 0.5769
+    },
+    {
+      "horizon": 10,
+      "model_type": "xgboost",
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "n_features": 13,
+      "weight": 0.929,
+      "avg_dir_acc": 0.6,
+      "avg_clf_acc": 0.5077
+    },
+    {
+      "horizon": 10,
+      "model_type": "lightgbm",
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "n_features": 13,
+      "weight": 1.0,
+      "avg_dir_acc": 0.6462,
+      "avg_clf_acc": 0.6154
+    },
+    {
+      "horizon": 10,
+      "model_type": "ridge",
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "n_features": 13,
+      "weight": 0.857,
+      "avg_dir_acc": 0.5538,
+      "avg_clf_acc": 0.5692
+    },
+    {
+      "horizon": 21,
+      "model_type": "xgboost",
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "n_features": 16,
+      "weight": 0.96,
+      "avg_dir_acc": 0.62,
+      "avg_clf_acc": 0.38
+    },
+    {
+      "horizon": 21,
+      "model_type": "lightgbm",
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "n_features": 16,
+      "weight": 0.96,
+      "avg_dir_acc": 0.62,
+      "avg_clf_acc": 0.62
+    },
+    {
+      "horizon": 21,
+      "model_type": "ridge",
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "n_features": 16,
+      "weight": 0.743,
+      "avg_dir_acc": 0.48,
+      "avg_clf_acc": 0.56
+    }
+  ],
+  "n_models": 9,
+  "best_model": "10d_lightgbm",
+  "best_accuracy": 0.6462,
+  "avg_accuracy": 0.5842777777777778,
+  "horizons": [
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "weight": 0.905,
+      "metrics": {
+        "avg_dir_acc": 0.5846,
+        "avg_clf_acc": 0.6154,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "weight": 0.94,
+      "metrics": {
+        "avg_dir_acc": 0.6077,
+        "avg_clf_acc": 0.6,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 5,
+      "features": [
+        "pct_up_days_63d",
+        "volatility_10d",
+        "mean_reversion_pressure",
+        "return_5d",
+        "season_cos_2",
+        "vol_regime_change",
+        "price_vs_sma_200",
+        "price_lag_2",
+        "zscore_126d",
+        "trend_slope_21d"
+      ],
+      "weight": 0.845,
+      "metrics": {
+        "avg_dir_acc": 0.5462,
+        "avg_clf_acc": 0.5769,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "weight": 0.929,
+      "metrics": {
+        "avg_dir_acc": 0.6,
+        "avg_clf_acc": 0.5077,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "weight": 1.0,
+      "metrics": {
+        "avg_dir_acc": 0.6462,
+        "avg_clf_acc": 0.6154,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 10,
+      "features": [
+        "return_21d",
+        "price_vs_sma_200",
+        "drawdown_regime",
+        "pct_up_days_63d",
+        "vol_regime",
+        "vol_regime_change",
+        "season_cos_1",
+        "sma_50_200_gap",
+        "return_10d",
+        "zscore_252d",
+        "bb_pct",
+        "price_vs_sma_5",
+        "price_lag_2"
+      ],
+      "weight": 0.857,
+      "metrics": {
+        "avg_dir_acc": 0.5538,
+        "avg_clf_acc": 0.5692,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "weight": 0.96,
+      "metrics": {
+        "avg_dir_acc": 0.62,
+        "avg_clf_acc": 0.38,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "weight": 0.96,
+      "metrics": {
+        "avg_dir_acc": 0.62,
+        "avg_clf_acc": 0.62,
+        "avg_spearman": 0
+      }
+    },
+    {
+      "horizon": 21,
+      "features": [
+        "season_cos_1",
+        "trend_slope_126d",
+        "macd_diff",
+        "drawdown",
+        "pct_up_days_126d",
+        "price_vs_sma_200",
+        "sma_50_200_gap",
+        "vol_regime",
+        "vol_regime_change",
+        "price_vs_sma_10",
+        "price_lag_10",
+        "sma_21",
+        "price_vs_sma_5",
+        "drawdown_regime",
+        "season_cos_2",
+        "pct_up_days_63d"
+      ],
+      "weight": 0.743,
+      "metrics": {
+        "avg_dir_acc": 0.48,
+        "avg_clf_acc": 0.56,
+        "avg_spearman": 0
+      }
+    }
+  ],
+  "features": [
+    "return_21d",
+    "price_vs_sma_200",
+    "drawdown_regime",
+    "pct_up_days_63d",
+    "vol_regime",
+    "vol_regime_change",
+    "season_cos_1",
+    "sma_50_200_gap",
+    "return_10d",
+    "zscore_252d",
+    "bb_pct",
+    "price_vs_sma_5",
+    "price_lag_2"
+  ],
+  "horizon": 10,
+  "regression": {
+    "avg_accuracy": 0.5842777777777778
+  },
+  "classification": {
+    "avg_accuracy": 0.5605111111111112
+  }
+}
