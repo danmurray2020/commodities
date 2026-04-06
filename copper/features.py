@@ -78,6 +78,11 @@ def add_price_features(df: pd.DataFrame, price_col: str = "copper_close") -> pd.
     if "crude_oil" in df.columns:
         df["copper_oil_ratio"] = price / df["crude_oil"]
         df["copper_oil_ratio_sma21"] = df["copper_oil_ratio"].rolling(21).mean()
+        # Z-score of copper/crude ratio over 1 year — captures divergence
+        # from the typical industrial-energy relationship
+        ratio_mean = df["copper_oil_ratio"].rolling(252, min_periods=63).mean()
+        ratio_std = df["copper_oil_ratio"].rolling(252, min_periods=63).std()
+        df["copper_crude_ratio_zscore"] = (df["copper_oil_ratio"] - ratio_mean) / ratio_std
     
 
     return df

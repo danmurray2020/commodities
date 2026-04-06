@@ -166,6 +166,23 @@ print(json.dumps({{"rows": len(df), "features": len(feature_cols)}}))
     }
 
 
+def _resolve_commodity_key(name: str) -> str | None:
+    """Resolve a commodity name or directory name to its COMMODITIES key.
+
+    Accepts the canonical key (e.g. 'cocoa'), the directory name (e.g. 'chocolate'),
+    the display name (e.g. 'Cocoa'), or the ticker (e.g. 'CC=F').
+    """
+    # Direct key match
+    if name in COMMODITIES:
+        return name
+    # Match by dir_name, display name (case-insensitive), or ticker
+    name_lower = name.lower()
+    for key, cfg in COMMODITIES.items():
+        if cfg.dir_name == name or cfg.name.lower() == name_lower or cfg.ticker == name:
+            return key
+    return None
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Train multi-horizon ensemble models")
@@ -175,9 +192,10 @@ def main():
     targets = args.commodities or list(COMMODITIES.keys())
 
     results = {}
-    for key in targets:
-        if key not in COMMODITIES:
-            print(f"Unknown commodity: {key}")
+    for name in targets:
+        key = _resolve_commodity_key(name)
+        if key is None:
+            print(f"Unknown commodity: {name}")
             continue
         results[key] = train_commodity_ensemble(key)
 

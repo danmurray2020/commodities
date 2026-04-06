@@ -5,6 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.regime_features import add_regime_features
+from agents.weather_risk import add_weather_risk_features
 
 import pandas as pd
 import numpy as np
@@ -224,6 +225,7 @@ def prepare_dataset(
     # Add technical features
     df = add_price_features(df)
     df = add_regime_features(df, price_col="coffee_close")
+    df = add_weather_risk_features(df, price_col="coffee_close", commodity="coffee")
 
     # Add fundamental data
     if use_cot:

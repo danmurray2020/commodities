@@ -5,6 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.regime_features import add_regime_features
+from agents.weather_risk import add_weather_risk_features
 
 import pandas as pd
 import numpy as np
@@ -152,6 +153,7 @@ def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63
     df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
     df = add_price_features(df)
     df = add_regime_features(df, price_col="sugar_close")
+    df = add_weather_risk_features(df, price_col="sugar_close", commodity="sugar")
     if use_cot: df = merge_cot_data(df)
     if use_weather: df = merge_weather_data(df)
     if use_enso: df = merge_enso_data(df)
