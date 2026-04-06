@@ -564,7 +564,9 @@ def add_regime_model_features(df: pd.DataFrame, price_col: str) -> pd.DataFrame:
     df["hmm_transition_risk"] = hmm_transition_risk
     df["garch_vol_forecast"] = garch_vol_forecast
     df["garch_vol_ratio"] = garch_vol_ratio
-    df["garch_vol_regime"] = garch_vol_regime
+    # Encode vol_regime as numeric (XGBoost can't handle strings)
+    vol_regime_map = {"low": 1, "normal": 2, "high": 3, "extreme": 4}
+    df["garch_vol_regime"] = pd.Series(garch_vol_regime).map(vol_regime_map).values
     df["garch_persistence"] = garch_persistence
 
     return df

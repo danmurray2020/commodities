@@ -39,6 +39,8 @@ ANALYSIS=$(
   python3 -m agents calibration 2>&1
   python3 -m agents drift 2>&1
   python3 -m agents data-quality 2>&1
+  python3 -m agents confidence 2>&1
+  python3 -m agents equities 2>&1
 )
 echo "$ANALYSIS" >> "$LOG_DIR/weekly_${DATE}.txt"
 

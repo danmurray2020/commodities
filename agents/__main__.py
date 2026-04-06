@@ -100,6 +100,9 @@ def main():
     elif command == "confidence":
         from .confidence_model import main as run
         run()
+    elif command == "equities":
+        from .equity_trades import main as run
+        run()
     elif command in ("weekly", "run"):
         from .orchestrator import main as run
         run()

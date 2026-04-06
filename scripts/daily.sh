@@ -14,11 +14,12 @@ cd "$REPO_DIR"
 echo "[$DATE] Starting daily pipeline..." >> "$LOG_DIR/cron.log"
 
 # === CORE PIPELINE ===
-# Data refresh → Predictions → Strategy → Execution costs → P&L forecast
+# Data refresh → Predictions → Strategy → Equity signals → Execution costs → P&L forecast
 OUTPUT=$(
   python3 -m agents refresh 2>&1
   python3 -m agents predict 2>&1
   python3 -m agents strategy 2>&1
+  python3 -m agents equities 2>&1
   python3 -m agents execute 2>&1
   python3 -m agents pnl 2>&1
 )
