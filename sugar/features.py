@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.regime_features import add_regime_features
 from agents.weather_risk import add_weather_risk_features
+from agents.demand_features import add_demand_features
 
 import pandas as pd
 import numpy as np
@@ -139,6 +140,20 @@ def merge_weather_data(df, weather_path=str(DATA_DIR / "weather.csv")):
     return df
 
 
+def merge_demand_data(df, demand_path=str(DATA_DIR / "demand_data.csv")):
+    """Merge demand-side proxy data (buyer stocks, consumer confidence)."""
+    try:
+        demand = pd.read_csv(demand_path, index_col=0, parse_dates=True)
+    except FileNotFoundError:
+        return df
+    new_cols = [c for c in demand.columns if c not in df.columns]
+    if not new_cols:
+        return df
+    df = df.join(demand[new_cols], how="left")
+    df[new_cols] = df[new_cols].ffill(limit=5)
+    return df
+
+
 def merge_enso_data(df, enso_path=str(DATA_DIR / "enso.csv")):
     try: enso = pd.read_csv(enso_path, index_col=0, parse_dates=True)
     except FileNotFoundError: return df
@@ -148,15 +163,57 @@ def merge_enso_data(df, enso_path=str(DATA_DIR / "enso.csv")):
     return df
 
 
+def merge_india_policy(df):
+    """Add India sugar export ban/restriction flags.
+
+    Known ban periods:
+      - 2016-06 to 2016-09: partial restrictions
+      - 2019-10 to 2020-10: subsidy period
+      - 2022-06 to 2023-10: full export ban
+      - 2023-11 onward: restrictions eased (no ban)
+    """
+    if not isinstance(df.index, pd.DatetimeIndex):
+        return df
+    df = df.copy()
+
+    # Define ban periods as (start, end) inclusive
+    ban_periods = [
+        (pd.Timestamp("2016-06-01"), pd.Timestamp("2016-09-30")),
+        (pd.Timestamp("2019-10-01"), pd.Timestamp("2020-10-31")),
+        (pd.Timestamp("2022-06-01"), pd.Timestamp("2023-10-31")),
+    ]
+
+    # Binary flag for export ban active
+    df["india_export_ban"] = 0
+    for start, end in ban_periods:
+        mask = (df.index >= start) & (df.index <= end)
+        df.loc[mask, "india_export_ban"] = 1
+
+    # Policy change dates (start and end of each ban)
+    change_dates = [d for pair in ban_periods for d in pair]
+    window = pd.Timedelta(days=90)
+
+    df["india_policy_change_90d"] = 0
+    for cd in change_dates:
+        mask = (df.index >= cd - window) & (df.index <= cd + window)
+        df.loc[mask, "india_policy_change_90d"] = 1
+
+    return df
+
+
 def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63,
                     use_cot=True, use_weather=True, use_enso=True):
     df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
     df = add_price_features(df)
     df = add_regime_features(df, price_col="sugar_close")
     df = add_weather_risk_features(df, price_col="sugar_close", commodity="sugar")
+    df = merge_india_policy(df)
     if use_cot: df = merge_cot_data(df)
     if use_weather: df = merge_weather_data(df)
     if use_enso: df = merge_enso_data(df)
+    # Add demand-side features
+    df = merge_demand_data(df)
+    df = add_demand_features(df, commodity="sugar")
     df = build_target(df, horizon=horizon)
     df = df.ffill()
     df = df.dropna()

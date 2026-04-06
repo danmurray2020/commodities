@@ -126,6 +126,47 @@ def merge_enso_data(df, enso_path=str(DATA_DIR / "enso.csv")):
     return df
 
 
+def merge_macro_data(df,
+                     macro_path=str(DATA_DIR / "macro_data.csv"),
+                     pmi_path=str(DATA_DIR / "china_pmi.csv")):
+    """Merge FRED macro data and China PMI into the feature DataFrame."""
+    # --- FRED macro data ---
+    try:
+        macro = pd.read_csv(macro_path, index_col=0, parse_dates=True)
+        df = df.join(macro, how="left")
+        macro_cols = [c for c in macro.columns if c in df.columns]
+        df[macro_cols] = df[macro_cols].ffill()
+    except FileNotFoundError:
+        pass
+
+    # --- China PMI ---
+    try:
+        pmi = pd.read_csv(pmi_path, index_col=0, parse_dates=True)
+        df = df.join(pmi, how="left")
+        if "china_pmi" in df.columns:
+            df["china_pmi"] = df["china_pmi"].ffill()
+    except FileNotFoundError:
+        pass
+
+    # --- Derived features ---
+    # Year-over-year changes for monthly macro indicators
+    if "housing_starts" in df.columns:
+        df["housing_starts_yoy"] = df["housing_starts"].pct_change(252)
+    if "industrial_prod" in df.columns:
+        df["industrial_prod_yoy"] = df["industrial_prod"].pct_change(252)
+
+    # China PMI derived features
+    if "china_pmi" in df.columns:
+        pmi_roll_mean = df["china_pmi"].rolling(252, min_periods=63).mean()
+        pmi_roll_std = df["china_pmi"].rolling(252, min_periods=63).std()
+        df["china_pmi_zscore"] = (df["china_pmi"] - pmi_roll_mean) / pmi_roll_std
+        df["china_pmi_above_50"] = (df["china_pmi"] > 50).astype(int)
+        # 3-month momentum (~63 trading days)
+        df["china_pmi_momentum"] = df["china_pmi"].diff(63)
+
+    return df
+
+
 def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63,
                     use_cot=True, use_weather=True, use_enso=True):
     df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
@@ -134,6 +175,7 @@ def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63
     if use_cot: df = merge_cot_data(df)
     if use_weather: df = merge_weather_data(df)
     if use_enso: df = merge_enso_data(df)
+    df = merge_macro_data(df)
     df = build_target(df, horizon=horizon)
     df = df.ffill()
     df = df.dropna()

@@ -8,6 +8,54 @@ import pandas as pd
 from scipy.stats import spearmanr
 
 
+# ── Volatility-adjusted target ─────────────────────────────────────────
+
+def add_volatility_adjusted_target(
+    df: pd.DataFrame,
+    price_col: str,
+    horizon: int,
+    vol_window: int = 63,
+) -> pd.DataFrame:
+    """Add target_return_vol_adj = target_return / rolling_volatility.
+
+    This normalizes returns by recent volatility, making predictions
+    comparable across different volatility regimes. A 10% return during
+    a 40-vol period is less surprising than 10% during a 10-vol period.
+
+    Args:
+        df: DataFrame with a 'target_return' column already computed.
+        price_col: Name of the price column used to compute rolling vol.
+        horizon: Prediction horizon in trading days.
+        vol_window: Lookback window for rolling volatility (default 63 days).
+
+    Returns:
+        DataFrame with 'target_vol_adj' column added (original target unchanged).
+    """
+    df = df.copy()
+
+    if "target_return" not in df.columns:
+        raise ValueError("DataFrame must have 'target_return' column. Call build_target first.")
+
+    if price_col not in df.columns:
+        raise ValueError(f"Price column '{price_col}' not found in DataFrame.")
+
+    # Annualized rolling volatility
+    daily_returns = df[price_col].pct_change()
+    rolling_vol = daily_returns.rolling(vol_window).std() * np.sqrt(252)
+
+    # Scale factor: vol * sqrt(horizon/252) gives expected vol over the horizon
+    horizon_vol = rolling_vol * np.sqrt(horizon / 252)
+
+    # Avoid division by zero — use NaN where vol is too small
+    horizon_vol = horizon_vol.replace(0, np.nan)
+    min_vol = 0.01  # floor at 1% annualized
+    horizon_vol = horizon_vol.clip(lower=min_vol * np.sqrt(horizon / 252))
+
+    df["target_vol_adj"] = df["target_return"] / horizon_vol
+
+    return df
+
+
 # ── Walk-forward CV with non-overlapping evaluation ──────────────────────
 
 def walk_forward_split(

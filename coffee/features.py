@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.regime_features import add_regime_features
 from agents.weather_risk import add_weather_risk_features
+from agents.demand_features import add_demand_features
 
 import pandas as pd
 import numpy as np
@@ -187,6 +188,21 @@ def merge_weather_data(df: pd.DataFrame, weather_path: str = str(DATA_DIR / "wea
     return df
 
 
+def merge_demand_data(df: pd.DataFrame, demand_path: str = str(DATA_DIR / "demand_data.csv")) -> pd.DataFrame:
+    """Merge demand-side proxy data (buyer stocks, consumer confidence)."""
+    try:
+        demand = pd.read_csv(demand_path, index_col=0, parse_dates=True)
+    except FileNotFoundError:
+        return df
+    # Avoid duplicate columns
+    new_cols = [c for c in demand.columns if c not in df.columns]
+    if not new_cols:
+        return df
+    df = df.join(demand[new_cols], how="left")
+    df[new_cols] = df[new_cols].ffill(limit=5)
+    return df
+
+
 def merge_enso_data(df: pd.DataFrame, enso_path: str = str(DATA_DIR / "enso.csv")) -> pd.DataFrame:
     """Merge ENSO (El Niño/La Niña) index data.
 
@@ -234,6 +250,10 @@ def prepare_dataset(
         df = merge_weather_data(df)
     if use_enso:
         df = merge_enso_data(df)
+
+    # Add demand-side features
+    df = merge_demand_data(df)
+    df = add_demand_features(df, commodity="coffee")
 
     # Add target
     df = build_target(df, horizon=horizon)
