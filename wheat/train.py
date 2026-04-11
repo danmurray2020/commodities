@@ -149,9 +149,11 @@ def main():
 
     reg_fold_spearman = []
     reg_fold_dir_acc = []
+    reg_fold_dir_acc_over = []  # overlapping (stable, ~test_size samples per fold)
     reg_fold_maes = []
     reg_fold_rmses = []
     clf_fold_acc_ind = []
+    clf_fold_acc_over = []
     for fold_i, (train_idx, test_idx) in enumerate(splits):
         val_size = min(63, len(train_idx) // 5)
         fit_idx, val_idx = train_idx[:-val_size], train_idx[-val_size:]
@@ -163,6 +165,7 @@ def main():
         reg_metrics = evaluate_predictions(y_ret[test_idx], reg_preds, horizon=HORIZON)
         reg_fold_spearman.append(reg_metrics["spearman"])
         reg_fold_dir_acc.append(reg_metrics["dir_acc_independent"])
+        reg_fold_dir_acc_over.append(reg_metrics["dir_acc_overlapping"])
         reg_fold_maes.append(reg_metrics["mae"])
         reg_fold_rmses.append(reg_metrics["rmse"])
 
@@ -174,10 +177,21 @@ def main():
                 eval_set=[(X[val_idx], y_dir[val_idx])], verbose=False)
         clf_metrics = evaluate_classification(y_dir[test_idx], clf.predict(X[test_idx]), horizon=HORIZON)
         clf_fold_acc_ind.append(clf_metrics["acc_independent"])
-        print(f"  Fold {fold_i}: Reg Spearman={reg_metrics['spearman']:.4f} DirAcc={reg_metrics['dir_acc_independent']:.2%} MAE={reg_metrics['mae']:.4f}, Clf={clf_metrics['acc_independent']:.2%}")
+        clf_fold_acc_over.append(clf_metrics["acc_overlapping"])
+        print(f"  Fold {fold_i}: Reg Spearman={reg_metrics['spearman']:.4f} "
+              f"DirAcc(ind)={reg_metrics['dir_acc_independent']:.2%} "
+              f"DirAcc(ovl)={reg_metrics['dir_acc_overlapping']:.2%} "
+              f"MAE={reg_metrics['mae']:.4f}, "
+              f"Clf(ind)={clf_metrics['acc_independent']:.2%} "
+              f"Clf(ovl)={clf_metrics['acc_overlapping']:.2%}")
 
-    print(f"\n  REGRESSION  — Spearman: {np.mean(reg_fold_spearman):.4f}, DirAcc: {np.mean(reg_fold_dir_acc):.2%}, MAE: {np.mean(reg_fold_maes):.4f}, RMSE: {np.mean(reg_fold_rmses):.4f}")
-    print(f"  CLASSIFIER  — Acc(ind): {np.mean(clf_fold_acc_ind):.2%}, Std: {np.std(clf_fold_acc_ind):.2%}")
+    print(f"\n  REGRESSION  — Spearman: {np.mean(reg_fold_spearman):.4f}, "
+          f"DirAcc(ind): {np.mean(reg_fold_dir_acc):.2%}, "
+          f"DirAcc(ovl): {np.mean(reg_fold_dir_acc_over):.2%}, "
+          f"MAE: {np.mean(reg_fold_maes):.4f}")
+    print(f"  CLASSIFIER  — Acc(ind): {np.mean(clf_fold_acc_ind):.2%}, "
+          f"Acc(ovl): {np.mean(clf_fold_acc_over):.2%}, "
+          f"Std(ind): {np.std(clf_fold_acc_ind):.2%}")
 
     # Train final models
     last_train, last_test = splits[-1]
@@ -244,6 +258,8 @@ def main():
             "avg_spearman": float(np.mean(reg_fold_spearman)),
             "fold_dir_acc_independent": reg_fold_dir_acc,
             "avg_dir_acc_independent": float(np.mean(reg_fold_dir_acc)),
+            "fold_dir_acc_overlapping": reg_fold_dir_acc_over,
+            "avg_dir_acc_overlapping": float(np.mean(reg_fold_dir_acc_over)),
             "fold_accuracies": reg_fold_dir_acc,  # backward compat
             "avg_accuracy": float(np.mean(reg_fold_dir_acc)),  # backward compat
             "std_accuracy": float(np.std(reg_fold_dir_acc)),
@@ -251,11 +267,14 @@ def main():
             "fold_rmses": reg_fold_rmses,
             "avg_mae": float(np.mean(reg_fold_maes)),
             "avg_rmse": float(np.mean(reg_fold_rmses)),
+            "test_size": TEST_SIZE,  # for sample-size confidence calc
         },
         "classification": {
             "params": clf_study.best_params,
             "fold_acc_independent": clf_fold_acc_ind,
             "avg_acc_independent": float(np.mean(clf_fold_acc_ind)),
+            "fold_acc_overlapping": clf_fold_acc_over,
+            "avg_acc_overlapping": float(np.mean(clf_fold_acc_over)),
             "fold_accuracies": clf_fold_acc_ind,  # backward compat
             "avg_accuracy": float(np.mean(clf_fold_acc_ind)),  # backward compat
             "std_accuracy": float(np.std(clf_fold_acc_ind)),

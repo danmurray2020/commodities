@@ -1,38 +1,39 @@
 {
   "commodity": "wheat",
   "ticker": "ZW=F",
-  "horizon": 21,
+  "horizon": 63,
   "features": [
-    "volatility_21d",
-    "trend_slope_63d",
-    "cot_comm_short",
-    "macd_signal",
-    "enso_state",
-    "eur_usd",
-    "oni",
-    "mean_reversion_pressure",
-    "macd",
-    "sma_50_200_gap",
-    "cot_comm_net_pct_oi",
-    "cot_noncomm_short",
-    "cot_net_comm",
+    "cot_open_interest",
     "price_vs_sma_50",
-    "usd_index",
-    "sma_50",
-    "trend_slope_21d",
-    "cot_spec_ratio",
-    "price_vs_sma_200",
-    "pct_up_days_63d",
-    "trend_regime",
-    "return_21d",
-    "season_cos_2",
-    "wheat_corn_ratio",
-    "return_1d",
+    "price_vs_sma_21",
+    "season_sin_1",
+    "volatility_21d",
+    "sma_5",
+    "oni_change_3m",
+    "macd",
+    "rsi_14",
     "cot_oi_change",
-    "zscore_126d"
+    "macd_signal",
+    "intl_temp_30d_avg",
+    "macd_diff",
+    "return_5d",
+    "volatility_10d",
+    "sma_10",
+    "return_1d",
+    "momentum_rank_252d",
+    "mean_reversion_pressure",
+    "usd_index",
+    "return_10d",
+    "price_vs_sma_5",
+    "price_lag_5",
+    "vol_regime_change",
+    "price_lag_1",
+    "vol_regime",
+    "cot_noncomm_long",
+    "corn"
   ],
-  "n_features": 27,
-  "purge_gap": 21,
+  "n_features": 28,
+  "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.7,
     "stop_loss_pct": 0.1,
@@ -42,95 +43,112 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 502,
-      "max_depth": 10,
-      "learning_rate": 0.02982402563380869,
-      "subsample": 0.5100878608832503,
-      "colsample_bytree": 0.6830077423722708,
-      "min_child_weight": 16,
-      "gamma": 0.30925716661646674,
-      "reg_alpha": 2.5473624825803833,
-      "reg_lambda": 0.00010138463600196037,
-      "max_delta_step": 0.9374637354593818
+      "n_estimators": 754,
+      "max_depth": 7,
+      "learning_rate": 0.05121277076414535,
+      "subsample": 0.9336384688401701,
+      "colsample_bytree": 0.3835207539808095,
+      "min_child_weight": 10,
+      "gamma": 0.6220624382073137,
+      "reg_alpha": 3.808532914893839e-08,
+      "reg_lambda": 0.009161829397801743,
+      "max_delta_step": 2.051445904308262
     },
     "fold_spearman": [
-      NaN,
-      NaN,
-      NaN,
-      NaN,
-      NaN
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
-    "avg_spearman": NaN,
+    "avg_spearman": 0.0,
     "fold_dir_acc_independent": [
-      0.3333,
-      0.6667,
-      0.5,
-      0.5,
-      0.8333
+      0.75,
+      0.25,
+      0.75,
+      0.75,
+      0.75
     ],
-    "avg_dir_acc_independent": 0.5666599999999999,
+    "avg_dir_acc_independent": 0.65,
+    "fold_dir_acc_overlapping": [
+      0.7698,
+      0.1587,
+      0.6865,
+      0.8413,
+      0.627
+    ],
+    "avg_dir_acc_overlapping": 0.6166600000000001,
     "fold_accuracies": [
-      0.3333,
-      0.6667,
-      0.5,
-      0.5,
-      0.8333
+      0.75,
+      0.25,
+      0.75,
+      0.75,
+      0.75
     ],
-    "avg_accuracy": 0.5666599999999999,
-    "std_accuracy": 0.16996993381183628,
+    "avg_accuracy": 0.65,
+    "std_accuracy": 0.20000000000000004,
     "fold_maes": [
-      0.051242,
-      0.087302,
-      0.043603,
-      0.034981,
-      0.049178
+      0.133139,
+      0.16984,
+      0.071778,
+      0.051018,
+      0.045226
     ],
     "fold_rmses": [
-      0.063102,
-      0.109784,
-      0.05083,
-      0.042036,
-      0.057428
+      0.184824,
+      0.204344,
+      0.085872,
+      0.071952,
+      0.057066
     ],
-    "avg_mae": 0.053261199999999995,
-    "avg_rmse": 0.064636
+    "avg_mae": 0.0942002,
+    "avg_rmse": 0.12081159999999998,
+    "test_size": 252
   },
   "classification": {
     "params": {
-      "n_estimators": 101,
-      "max_depth": 10,
-      "learning_rate": 0.008269978695407285,
-      "subsample": 0.6610891538905899,
-      "colsample_bytree": 0.41187770776622173,
-      "min_child_weight": 15,
-      "gamma": 8.745906173160616,
-      "reg_alpha": 2.8114145501653136e-07,
-      "reg_lambda": 4.281160726357662e-07,
-      "max_delta_step": 4.324816806226066
+      "n_estimators": 531,
+      "max_depth": 9,
+      "learning_rate": 0.23431286784247707,
+      "subsample": 0.6480319399810283,
+      "colsample_bytree": 0.3623536840041741,
+      "min_child_weight": 21,
+      "gamma": 8.72900933662789,
+      "reg_alpha": 1.8964084390070308,
+      "reg_lambda": 5.102007825386359e-07,
+      "max_delta_step": 2.30318121689373
     },
     "fold_acc_independent": [
-      0.8333,
-      0.6667,
-      0.8333,
-      0.6667,
-      0.8333
+      0.75,
+      0.75,
+      1.0,
+      0.5,
+      0.75
     ],
-    "avg_acc_independent": 0.76666,
+    "avg_acc_independent": 0.75,
+    "fold_acc_overlapping": [
+      0.619,
+      0.8413,
+      0.6151,
+      0.6429,
+      0.6746
+    ],
+    "avg_acc_overlapping": 0.67858,
     "fold_accuracies": [
-      0.8333,
-      0.6667,
-      0.8333,
-      0.6667,
-      0.8333
+      0.75,
+      0.75,
+      1.0,
+      0.5,
+      0.75
     ],
-    "avg_accuracy": 0.76666,
-    "std_accuracy": 0.08161699822953553
+    "avg_accuracy": 0.75,
+    "std_accuracy": 0.15811388300841897
   },
   "holdout": {
     "size": 126,
-    "reg_direction_accuracy": 0.8333,
-    "reg_spearman": NaN,
-    "reg_mae": 0.049178,
-    "clf_accuracy": 0.8333
+    "reg_direction_accuracy": 1.0,
+    "reg_spearman": 0.0,
+    "reg_mae": 0.078583,
+    "clf_accuracy": 1.0
   }
 }

@@ -230,11 +230,23 @@ def filter_stable_features(
 
 # ── Optuna objective with Spearman ───────────────────────────────────────
 
-def reg_objective_spearman(trial, X, y, splits, horizon=63):
-    """Optuna objective for regressor using Spearman correlation."""
+def reg_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int = 10):
+    """Optuna objective for regressor.
+
+    NOTE: despite the name (kept for backwards-compat), the objective is
+    directional accuracy on **overlapping** samples, not Spearman on
+    non-overlapping samples. The original non-overlapping Spearman was
+    degenerate at horizon=63 — n_independent_per_fold = test_size // horizon
+    is only 4, and Spearman on n=4 returns 0 for almost any prediction
+    (too few unique ranks), which made the objective constant across trials
+    so Optuna could not actually distinguish between models. Switching to
+    dir_acc_overlapping gives n≈test_size samples per fold, restoring
+    meaningful optimization. The honest non-overlapping metrics are still
+    computed and reported in production_metadata.json for evaluation.
+    """
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 800),
-        "max_depth": trial.suggest_int("max_depth", 2, 10),
+        "max_depth": trial.suggest_int("max_depth", 2, max_depth_max),
         "learning_rate": trial.suggest_float("learning_rate", 0.005, 0.3, log=True),
         "subsample": trial.suggest_float("subsample", 0.5, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1.0),
@@ -257,18 +269,26 @@ def reg_objective_spearman(trial, X, y, splits, horizon=63):
                   eval_set=[(X[val_idx], y[val_idx])], verbose=False)
         preds = model.predict(X[test_idx])
 
-        # Evaluate on non-overlapping samples
+        # Use overlapping directional accuracy as the objective metric.
+        # See docstring above for rationale.
         metrics = evaluate_predictions(y[test_idx], preds, horizon=horizon)
-        fold_scores.append(metrics["spearman"])
+        fold_scores.append(metrics["dir_acc_overlapping"])
 
-    return np.mean(fold_scores) - 0.5 * np.std(fold_scores)
+    return float(np.mean(fold_scores) - 0.5 * np.std(fold_scores))
 
 
-def clf_objective_spearman(trial, X, y, splits, horizon=63):
-    """Optuna objective for classifier using non-overlapping accuracy."""
+def clf_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int = 10):
+    """Optuna objective for classifier using overlapping accuracy.
+
+    Same rationale as reg_objective_spearman: the previous
+    non-overlapping accuracy on n=4 per fold was too granular (only
+    {0, 0.25, 0.5, 0.75, 1.0}) for Optuna to optimize meaningfully.
+    Overlapping accuracy on n≈test_size per fold has the resolution
+    Optuna needs.
+    """
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 800),
-        "max_depth": trial.suggest_int("max_depth", 2, 10),
+        "max_depth": trial.suggest_int("max_depth", 2, max_depth_max),
         "learning_rate": trial.suggest_float("learning_rate", 0.005, 0.3, log=True),
         "subsample": trial.suggest_float("subsample", 0.5, 1.0),
         "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1.0),
@@ -296,6 +316,6 @@ def clf_objective_spearman(trial, X, y, splits, horizon=63):
         preds = model.predict(X[test_idx])
 
         metrics = evaluate_classification(y[test_idx], preds, horizon=horizon)
-        fold_scores.append(metrics["acc_independent"])
+        fold_scores.append(metrics["acc_overlapping"])
 
-    return np.mean(fold_scores) - 0.5 * np.std(fold_scores)
+    return float(np.mean(fold_scores) - 0.5 * np.std(fold_scores))
