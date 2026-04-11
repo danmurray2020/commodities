@@ -82,6 +82,14 @@ def add_price_features(df: pd.DataFrame, price_col: str = "coffee_close") -> pd.
         # Vietnam harvest: October - February
         df["vietnam_harvest"] = df.index.month.isin([10, 11, 12, 1, 2]).astype(int)
 
+        # Brazil frost-season flag (May–August, southern-hemisphere winter).
+        # Frost risk peaks in this window — historic frost events drove
+        # 50-100% coffee price spikes in days. Splitting the model on this
+        # regime lets it learn frost-season-specific feature relationships
+        # without diluting them across the rest of the year.
+        df["brazil_frost_season"] = df.index.month.isin([5, 6, 7, 8]).astype(int)
+        df["brazil_frost_peak"] = df.index.month.isin([6, 7]).astype(int)  # peak risk weeks
+
     # Mean-reversion features (z-scores relative to long-term distributions)
     for window in [126, 252]:  # 6mo, 1yr
         rolling_mean = price.rolling(window).mean()

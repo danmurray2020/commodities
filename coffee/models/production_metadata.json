@@ -3,26 +3,13 @@
   "ticker": "KC=F",
   "horizon": 63,
   "features": [
-    "momentum_rank_252d",
-    "cot_open_interest",
     "sma_50_200_gap",
-    "macd",
-    "coffee_demand_divergence",
-    "sma_5",
-    "return_21d",
-    "price_lag_1",
-    "volatility_21d",
-    "zscore_252d_change_21d",
-    "sbux",
-    "price_vs_sma_10",
+    "sma_50_200_cross",
     "buyer_momentum",
-    "macd_signal",
-    "price_lag_5",
-    "cot_oi_change",
-    "brl_usd",
-    "sbux_return_21d"
+    "sbux_return_21d",
+    "sbux_vs_sma50"
   ],
-  "n_features": 18,
+  "n_features": 5,
   "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.75,
@@ -33,16 +20,16 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 598,
-      "max_depth": 5,
-      "learning_rate": 0.029556628798732155,
-      "subsample": 0.966143392272163,
-      "colsample_bytree": 0.6205259280257767,
-      "min_child_weight": 7,
-      "gamma": 8.69331222466675,
-      "reg_alpha": 5.3818032982043556e-08,
-      "reg_lambda": 1.3039829329265948e-06,
-      "max_delta_step": 0.2737285223610547
+      "n_estimators": 702,
+      "max_depth": 7,
+      "learning_rate": 0.1613021647073145,
+      "subsample": 0.9139860495965257,
+      "colsample_bytree": 0.45202324041235986,
+      "min_child_weight": 4,
+      "gamma": 0.6344241409251031,
+      "reg_alpha": 0.0006450116203991933,
+      "reg_lambda": 0.0003372615098736414,
+      "max_delta_step": 2.093486697992321
     },
     "fold_spearman": [
       0.0,
@@ -53,92 +40,92 @@
     ],
     "avg_spearman": 0.0,
     "fold_dir_acc_independent": [
-      0.25,
+      0.75,
       0.5,
       0.5,
       1.0,
-      0.5
+      0.75
     ],
-    "avg_dir_acc_independent": 0.55,
+    "avg_dir_acc_independent": 0.7,
     "fold_dir_acc_overlapping": [
-      0.2698,
-      0.4167,
-      0.6706,
-      0.7976,
-      0.381
+      0.7897,
+      0.4484,
+      0.6825,
+      0.7817,
+      0.4484
     ],
-    "avg_dir_acc_overlapping": 0.50714,
+    "avg_dir_acc_overlapping": 0.6301399999999999,
     "fold_accuracies": [
-      0.25,
+      0.75,
       0.5,
       0.5,
       1.0,
-      0.5
+      0.75
     ],
-    "avg_accuracy": 0.55,
-    "std_accuracy": 0.2449489742783178,
+    "avg_accuracy": 0.7,
+    "std_accuracy": 0.18708286933869706,
     "fold_maes": [
-      0.145897,
-      0.137712,
-      0.138526,
-      0.157089,
-      0.181789
+      0.139874,
+      0.136746,
+      0.137181,
+      0.135289,
+      0.187827
     ],
     "fold_rmses": [
-      0.170903,
-      0.186486,
-      0.157779,
-      0.188839,
-      0.20953
+      0.163845,
+      0.184618,
+      0.155425,
+      0.165939,
+      0.227346
     ],
-    "avg_mae": 0.15220260000000002,
-    "avg_rmse": 0.18270740000000002,
+    "avg_mae": 0.1473834,
+    "avg_rmse": 0.1794346,
     "test_size": 252
   },
   "classification": {
     "params": {
-      "n_estimators": 733,
-      "max_depth": 7,
-      "learning_rate": 0.03258731624525508,
-      "subsample": 0.5858047896122504,
-      "colsample_bytree": 0.5496265374708752,
+      "n_estimators": 201,
+      "max_depth": 10,
+      "learning_rate": 0.10641265227993395,
+      "subsample": 0.9772278398895733,
+      "colsample_bytree": 0.41218238390007933,
       "min_child_weight": 2,
-      "gamma": 8.436835583793624,
-      "reg_alpha": 3.345531901023117e-07,
-      "reg_lambda": 5.754072219895311e-05,
-      "max_delta_step": 0.0033090715198786924
+      "gamma": 8.997716657199504,
+      "reg_alpha": 9.169748592816884e-07,
+      "reg_lambda": 7.914486074671361e-08,
+      "max_delta_step": 3.7725144331605867
     },
     "fold_acc_independent": [
       0.75,
-      0.5,
-      0.5,
+      0.25,
       1.0,
-      0.5
+      1.0,
+      1.0
     ],
-    "avg_acc_independent": 0.65,
+    "avg_acc_independent": 0.8,
     "fold_acc_overlapping": [
-      0.7302,
-      0.4167,
-      0.6706,
-      0.7976,
-      0.381
+      0.8016,
+      0.5516,
+      0.6905,
+      0.8889,
+      0.6627
     ],
-    "avg_acc_overlapping": 0.5992200000000001,
+    "avg_acc_overlapping": 0.71906,
     "fold_accuracies": [
       0.75,
-      0.5,
-      0.5,
+      0.25,
       1.0,
-      0.5
+      1.0,
+      1.0
     ],
-    "avg_accuracy": 0.65,
-    "std_accuracy": 0.2
+    "avg_accuracy": 0.8,
+    "std_accuracy": 0.291547594742265
   },
   "holdout": {
     "size": 126,
     "reg_direction_accuracy": 0.0,
     "reg_spearman": 0.0,
-    "reg_mae": 0.248165,
-    "clf_accuracy": 0.0
+    "reg_mae": 0.272302,
+    "clf_accuracy": 0.5
   }
 }
