@@ -3,18 +3,32 @@
   "ticker": "ZS=F",
   "horizon": 63,
   "features": [
-    "sma_5",
     "oni_change_3m",
-    "cot_net_comm",
-    "cot_comm_net_pct_oi",
-    "brl_usd",
-    "cot_noncomm_short",
-    "sp500",
+    "pct_up_days_126d",
     "cot_noncomm_long",
-    "us_precip_7d_sum",
-    "trend_slope_63d"
+    "mei",
+    "corn",
+    "cot_net_comm",
+    "cot_comm_short",
+    "brl_usd",
+    "oni",
+    "vol_regime_change",
+    "us_temp_anomaly",
+    "enso_state",
+    "wheat",
+    "drawdown",
+    "momentum_rank_252d",
+    "brazil_temp_anomaly",
+    "regime_uncertainty",
+    "cot_net_spec",
+    "cot_spec_ratio",
+    "season_sin_2",
+    "cot_oi_change",
+    "sma_50_200_cross",
+    "cot_noncomm_short",
+    "volatility_21d"
   ],
-  "n_features": 10,
+  "n_features": 24,
   "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.7,
@@ -25,95 +39,112 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 207,
-      "max_depth": 7,
-      "learning_rate": 0.009143248589529567,
-      "subsample": 0.79206350496084,
-      "colsample_bytree": 0.4026894669224536,
-      "min_child_weight": 1,
-      "gamma": 0.8712577969392343,
-      "reg_alpha": 4.471568911606077,
-      "reg_lambda": 50.54127699234903,
-      "max_delta_step": 4.06192012001854
+      "n_estimators": 505,
+      "max_depth": 8,
+      "learning_rate": 0.07638833307827606,
+      "subsample": 0.8449578076259135,
+      "colsample_bytree": 0.9204773075318489,
+      "min_child_weight": 25,
+      "gamma": 0.044181049874150335,
+      "reg_alpha": 6.483362111198734e-07,
+      "reg_lambda": 17.999570992201317,
+      "max_delta_step": 1.1075918036841494
     },
     "fold_spearman": [
-      NaN,
-      NaN,
       0.0,
-      -0.2582,
-      0.2
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
-    "avg_spearman": NaN,
+    "avg_spearman": 0.0,
     "fold_dir_acc_independent": [
-      0.5,
-      0.5,
+      1.0,
+      0.75,
       0.5,
       0.25,
-      0.5
+      0.75
     ],
-    "avg_dir_acc_independent": 0.45,
+    "avg_dir_acc_independent": 0.65,
+    "fold_dir_acc_overlapping": [
+      0.7937,
+      0.8452,
+      0.6587,
+      0.4921,
+      0.5278
+    ],
+    "avg_dir_acc_overlapping": 0.6635,
     "fold_accuracies": [
-      0.5,
-      0.5,
+      1.0,
+      0.75,
       0.5,
       0.25,
-      0.5
+      0.75
     ],
-    "avg_accuracy": 0.45,
-    "std_accuracy": 0.1,
+    "avg_accuracy": 0.65,
+    "std_accuracy": 0.25495097567963926,
     "fold_maes": [
-      0.12419,
-      0.075662,
-      0.074628,
-      0.095056,
-      0.054952
+      0.083194,
+      0.045555,
+      0.061114,
+      0.107446,
+      0.060146
     ],
     "fold_rmses": [
-      0.149236,
-      0.092088,
-      0.095081,
-      0.123419,
-      0.066724
+      0.094098,
+      0.057608,
+      0.074925,
+      0.129922,
+      0.072693
     ],
-    "avg_mae": 0.08489759999999999,
-    "avg_rmse": 0.1053096
+    "avg_mae": 0.071491,
+    "avg_rmse": 0.0858492,
+    "test_size": 252
   },
   "classification": {
     "params": {
-      "n_estimators": 154,
-      "max_depth": 5,
-      "learning_rate": 0.013500950442118576,
-      "subsample": 0.6377166700426,
-      "colsample_bytree": 0.8608272120683933,
-      "min_child_weight": 6,
-      "gamma": 5.981778728468903,
-      "reg_alpha": 1.3739728743789516e-08,
-      "reg_lambda": 0.1619542357588276,
-      "max_delta_step": 0.4306384232300625
+      "n_estimators": 254,
+      "max_depth": 8,
+      "learning_rate": 0.06195599934997673,
+      "subsample": 0.6670523453793433,
+      "colsample_bytree": 0.9877191505477655,
+      "min_child_weight": 24,
+      "gamma": 9.817310358012156,
+      "reg_alpha": 55.31641804956341,
+      "reg_lambda": 0.09328167404235281,
+      "max_delta_step": 3.771568338764827
     },
     "fold_acc_independent": [
       1.0,
-      0.5,
+      1.0,
       0.75,
       0.25,
-      0.5
+      1.0
     ],
-    "avg_acc_independent": 0.6,
+    "avg_acc_independent": 0.8,
+    "fold_acc_overlapping": [
+      0.7937,
+      0.9206,
+      0.7738,
+      0.4921,
+      0.8492
+    ],
+    "avg_acc_overlapping": 0.7658799999999999,
     "fold_accuracies": [
       1.0,
-      0.5,
+      1.0,
       0.75,
       0.25,
-      0.5
+      1.0
     ],
-    "avg_accuracy": 0.6,
-    "std_accuracy": 0.25495097567963926
+    "avg_accuracy": 0.8,
+    "std_accuracy": 0.291547594742265
   },
   "holdout": {
     "size": 126,
     "reg_direction_accuracy": 1.0,
     "reg_spearman": 0.0,
-    "reg_mae": 0.06704,
+    "reg_mae": 0.093681,
     "clf_accuracy": 0.5
   }
 }

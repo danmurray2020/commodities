@@ -1,25 +1,43 @@
 {
   "commodity": "sugar",
   "ticker": "SB=F",
-  "horizon": 42,
+  "horizon": 63,
   "features": [
-    "brl_vs_sma50",
-    "oni",
-    "india_precip_30d_sum",
-    "brl_return_21d",
-    "price_lag_1",
-    "season_sin",
-    "trend_slope_63d",
-    "bb_pct",
+    "brazil_temp_30d_avg",
+    "price_vs_sma_200",
+    "price_vs_sma_50",
+    "bb_low",
+    "pct_up_days_21d",
     "india_precip_7d_sum",
-    "cot_noncomm_short_chg",
-    "enso_state",
+    "sma_21",
+    "macd",
+    "drawdown_regime",
+    "season_sin",
+    "drawdown",
+    "mei",
+    "brazil_temp_7d_avg",
+    "return_10d",
+    "sma_10",
+    "volatility_21d",
     "sma_50",
-    "season_cos",
-    "sma_5"
+    "price_lag_2",
+    "price_lag_3",
+    "usd_index",
+    "sma_5",
+    "rsi_14",
+    "momentum_rank_252d",
+    "cot_noncomm_short",
+    "brazil_temp_anomaly",
+    "price_vs_sma_10",
+    "volatility_10d",
+    "zscore_126d",
+    "brazil_avg_temp",
+    "return_1d",
+    "trend_slope_21d",
+    "return_21d"
   ],
-  "n_features": 14,
-  "purge_gap": 42,
+  "n_features": 32,
+  "purge_gap": 63,
   "strategy": {
     "confidence_threshold": 0.7,
     "stop_loss_pct": 0.1,
@@ -29,95 +47,112 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 690,
-      "max_depth": 2,
-      "learning_rate": 0.010348542950532547,
-      "subsample": 0.9466493601869366,
-      "colsample_bytree": 0.3801790904473233,
-      "min_child_weight": 8,
-      "gamma": 0.8977351117742804,
-      "reg_alpha": 0.00043045860966577716,
-      "reg_lambda": 0.0009533048382905551,
-      "max_delta_step": 3.415676163667211
+      "n_estimators": 375,
+      "max_depth": 7,
+      "learning_rate": 0.04564964024550497,
+      "subsample": 0.7086417311844653,
+      "colsample_bytree": 0.7636133072727893,
+      "min_child_weight": 20,
+      "gamma": 0.37490399401316904,
+      "reg_alpha": 0.004776850902945257,
+      "reg_lambda": 4.429220305294882e-07,
+      "max_delta_step": 0.9114150719798247
     },
     "fold_spearman": [
-      NaN,
-      NaN,
       0.0,
-      0.866,
-      NaN
+      0.0,
+      0.0,
+      0.0,
+      0.0
     ],
-    "avg_spearman": NaN,
+    "avg_spearman": 0.0,
     "fold_dir_acc_independent": [
-      0.3333,
-      0.3333,
-      0.0,
-      0.3333,
-      0.3333
+      0.25,
+      0.5,
+      0.75,
+      0.75,
+      0.75
     ],
-    "avg_dir_acc_independent": 0.26664,
+    "avg_dir_acc_independent": 0.6,
+    "fold_dir_acc_overlapping": [
+      0.3452,
+      0.7183,
+      0.5714,
+      0.6627,
+      0.5516
+    ],
+    "avg_dir_acc_overlapping": 0.56984,
     "fold_accuracies": [
-      0.3333,
-      0.3333,
-      0.0,
-      0.3333,
-      0.3333
+      0.25,
+      0.5,
+      0.75,
+      0.75,
+      0.75
     ],
-    "avg_accuracy": 0.26664,
-    "std_accuracy": 0.13331999999999997,
+    "avg_accuracy": 0.6,
+    "std_accuracy": 0.2,
     "fold_maes": [
-      0.138729,
-      0.091259,
-      0.09501,
-      0.072961,
-      0.04626
+      0.065267,
+      0.08636,
+      0.119292,
+      0.095428,
+      0.061468
     ],
     "fold_rmses": [
-      0.162693,
-      0.112898,
-      0.106551,
-      0.082366,
-      0.051866
+      0.079007,
+      0.106503,
+      0.13724,
+      0.113578,
+      0.074904
     ],
-    "avg_mae": 0.0888438,
-    "avg_rmse": 0.1032748
+    "avg_mae": 0.08556300000000001,
+    "avg_rmse": 0.1022464,
+    "test_size": 252
   },
   "classification": {
     "params": {
-      "n_estimators": 409,
-      "max_depth": 3,
-      "learning_rate": 0.006299905447408887,
-      "subsample": 0.8339180765452285,
-      "colsample_bytree": 0.84275560891182,
-      "min_child_weight": 25,
-      "gamma": 3.9869353258401046,
-      "reg_alpha": 7.037397451873014e-05,
-      "reg_lambda": 2.24849027717776e-08,
-      "max_delta_step": 2.5525545006510613
+      "n_estimators": 414,
+      "max_depth": 2,
+      "learning_rate": 0.009003858856777314,
+      "subsample": 0.5045620066409382,
+      "colsample_bytree": 0.8096463755860638,
+      "min_child_weight": 24,
+      "gamma": 3.7361322786715663,
+      "reg_alpha": 1.1619135060984877e-05,
+      "reg_lambda": 0.00710303787799819,
+      "max_delta_step": 2.8994939088375857
     },
     "fold_acc_independent": [
+      0.0,
+      0.5,
       1.0,
       1.0,
-      0.6667,
-      1.0,
-      1.0
+      0.5
     ],
-    "avg_acc_independent": 0.9333400000000001,
+    "avg_acc_independent": 0.6,
+    "fold_acc_overlapping": [
+      0.5357,
+      0.7183,
+      0.7302,
+      0.8294,
+      0.5675
+    ],
+    "avg_acc_overlapping": 0.67622,
     "fold_accuracies": [
+      0.0,
+      0.5,
       1.0,
       1.0,
-      0.6667,
-      1.0,
-      1.0
+      0.5
     ],
-    "avg_accuracy": 0.9333400000000001,
-    "std_accuracy": 0.13332000000000002
+    "avg_accuracy": 0.6,
+    "std_accuracy": 0.37416573867739417
   },
   "holdout": {
     "size": 126,
-    "reg_direction_accuracy": 0.3333,
-    "reg_spearman": NaN,
-    "reg_mae": 0.04626,
-    "clf_accuracy": 1.0
+    "reg_direction_accuracy": 1.0,
+    "reg_spearman": 0.0,
+    "reg_mae": 0.038137,
+    "clf_accuracy": 0.5
   }
 }
