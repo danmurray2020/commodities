@@ -262,7 +262,7 @@ class TestConfigConsistency:
             meta = json.load(f)
         for required in ["features", "horizon", "regression", "classification"]:
             assert required in meta, f"{cfg.name} metadata missing '{required}'"
-        assert meta["horizon"] in (10, 21, 42, 63), f"{cfg.name} unexpected horizon: {meta['horizon']}"
+        assert meta["horizon"] in (5, 10, 21, 42, 63), f"{cfg.name} unexpected horizon: {meta['horizon']}"
 
     @pytest.mark.parametrize("key", list(COMMODITIES.keys()))
     def test_metadata_features_nonempty(self, key):

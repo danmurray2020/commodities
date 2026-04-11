@@ -47,37 +47,34 @@ import json, sys, joblib, pandas as pd
 sys.path.insert(0, '.')
 sys.path.insert(0, '..')
 import features as _f
-from agents.regime_features import add_regime_features
 
-# add_price_features is mandatory; the supplementary merges are optional —
-# the original 7 commodities define them, the 13 newer ones don't.
-def _noop(df, *args, **kwargs):
-    return df
+# Use the commodity's own prepare_dataset() — it runs the complete
+# feature pipeline (add_price_features + add_regime_features +
+# add_demand_features + add_weather_risk_features + all merge_* steps)
+# in exactly the order the model was trained on. Without this, any model
+# using demand/weather/regime features fails at predict time because the
+# subprocess only added a subset of feature columns.
+#
+# We monkey-patch build_target to a no-op so prepare_dataset doesn't
+# drop the latest rows — those are exactly the rows we want to predict
+# on. The dropna() inside prepare_dataset will still remove rows with
+# missing features, but the most recent row stays.
+if hasattr(_f, 'build_target'):
+    _f.build_target = lambda df, *a, **kw: df
 
-add_price_features = _f.add_price_features
-merge_cot_data     = getattr(_f, 'merge_cot_data',     _noop)
-merge_weather_data = getattr(_f, 'merge_weather_data', _noop)
-merge_enso_data    = getattr(_f, 'merge_enso_data',    _noop)
-
-df = pd.read_csv('data/combined_features.csv', index_col=0, parse_dates=True)
-df = add_price_features(df)
-# Add regime features (vol_regime_change, mean_reversion_pressure, drawdown,
-# etc.) — training pipelines call these via prepare_dataset(), but the
-# predict pipeline used to skip them, which broke any model whose feature
-# list referenced regime columns. Now applied unconditionally so trained
-# models with regime features just work.
-try:
-    df = add_regime_features(df, price_col='{cfg.price_col}')
-except Exception as _e:
-    # If price col is missing or regime features can't be computed, leave
-    # df as-is — the missing-features check below will produce a clearer
-    # diagnostic than a stack trace from inside add_regime_features.
-    pass
-df = merge_cot_data(df)
-df = merge_weather_data(df)
-df = merge_enso_data(df)
-df = df.ffill()
-df = df.dropna()
+if hasattr(_f, 'prepare_dataset'):
+    out = _f.prepare_dataset()
+    df = out[0] if isinstance(out, tuple) else out
+else:
+    # Fallback for any commodity without prepare_dataset
+    from agents.regime_features import add_regime_features
+    df = pd.read_csv('data/combined_features.csv', index_col=0, parse_dates=True)
+    df = _f.add_price_features(df)
+    try:
+        df = add_regime_features(df, price_col='{cfg.price_col}')
+    except Exception:
+        pass
+    df = df.ffill().dropna()
 
 with open('models/production_metadata.json') as f:
     meta = json.load(f)
