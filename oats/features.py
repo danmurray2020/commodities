@@ -8,7 +8,7 @@ from agents.regime_features import add_regime_features
 
 import pandas as pd
 import numpy as np
-import ta
+from agents.indicators import rsi, MACD, BollingerBands, average_true_range
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -31,23 +31,23 @@ def add_price_features(df: pd.DataFrame, price_col: str = "oats_close") -> pd.Da
         df[f"volatility_{window}d"] = price.pct_change().rolling(window).std() * np.sqrt(252)
 
     # RSI
-    df["rsi_14"] = ta.momentum.rsi(price, window=14)
+    df["rsi_14"] = rsi(price, window=14)
 
     # MACD
-    macd = ta.trend.MACD(price)
+    macd = MACD(price)
     df["macd"] = macd.macd()
     df["macd_signal"] = macd.macd_signal()
     df["macd_diff"] = macd.macd_diff()
 
     # Bollinger Bands
-    bb = ta.volatility.BollingerBands(price, window=20)
+    bb = BollingerBands(price, window=20)
     df["bb_high"] = bb.bollinger_hband()
     df["bb_low"] = bb.bollinger_lband()
     df["bb_pct"] = bb.bollinger_pband()
 
     # ATR
     if all(c in df.columns for c in ["High", "Low"]):
-        df["atr_14"] = ta.volatility.average_true_range(df["High"], df["Low"], price, window=14)
+        df["atr_14"] = average_true_range(df["High"], df["Low"], price, window=14)
 
     # Price lags
     for lag in [1, 2, 3, 5, 10]:

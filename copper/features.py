@@ -8,7 +8,7 @@ from agents.regime_features import add_regime_features
 
 import pandas as pd
 import numpy as np
-import ta
+from agents.indicators import rsi, MACD, BollingerBands, average_true_range
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -25,12 +25,12 @@ def add_price_features(df: pd.DataFrame, price_col: str = "copper_close") -> pd.
     for window in [10, 21, 63]:
         df[f"volatility_{window}d"] = price.pct_change().rolling(window).std() * np.sqrt(252)
 
-    df["rsi_14"] = ta.momentum.rsi(price, window=14)
-    macd = ta.trend.MACD(price)
+    df["rsi_14"] = rsi(price, window=14)
+    macd = MACD(price)
     df["macd"] = macd.macd()
     df["macd_signal"] = macd.macd_signal()
     df["macd_diff"] = macd.macd_diff()
-    bb = ta.volatility.BollingerBands(price, window=20)
+    bb = BollingerBands(price, window=20)
     df["bb_pct"] = bb.bollinger_pband()
 
     for lag in [1, 2, 3, 5, 10]:
