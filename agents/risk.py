@@ -95,9 +95,9 @@ def _load_current_positions() -> dict:
     try:
         from db import get_db
         db = get_db()
-        # Try to get open trades
+        # Open trades = trades with no exit_date set yet (per db/schema.sql)
         trades = db.conn.execute(
-            "SELECT commodity, direction, size FROM trades WHERE status = 'open'"
+            "SELECT commodity, direction, position_size FROM trades WHERE exit_date IS NULL"
         ).fetchall()
         if trades:
             positions = {}
@@ -223,8 +223,9 @@ def check_drawdown(max_allowed: float = 0.15) -> dict:
     try:
         from db import get_db
         db = get_db()
+        # Closed trades = trades with exit_date set; pnl_pct is fractional return.
         trades = db.conn.execute(
-            "SELECT closed_at, pnl FROM trades WHERE status = 'closed' ORDER BY closed_at"
+            "SELECT exit_date, pnl_pct FROM trades WHERE exit_date IS NOT NULL ORDER BY exit_date"
         ).fetchall()
         if trades:
             cumulative = 1.0

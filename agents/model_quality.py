@@ -528,7 +528,7 @@ def run_quality_agent(commodity_keys: list[str] = None, diagnose_only: bool = Fa
                     resolution="Retrained with quality config")
 
                 new = report.get("new_metrics", {})
-                old_acc = diag["metrics"].get("reg_acc")
+                old_acc = diag.get("metrics", {}).get("reg_acc")
                 new_acc = new.get("reg_acc")
 
                 if old_acc is not None and new_acc is not None:
@@ -586,7 +586,7 @@ def main():
         retrain = result.get("retrain", {})
         new_metrics = retrain.get("new_metrics", {})
 
-        old_acc = diag["metrics"].get("reg_acc")
+        old_acc = diag.get("metrics", {}).get("reg_acc")
         new_acc = new_metrics.get("reg_acc")
         old_str = f"{old_acc:.1%}" if old_acc is not None else "?"
         new_str = f"{new_acc:.1%}" if new_acc is not None else "—"

@@ -45,36 +45,62 @@ config = TradeConfig(
     slippage_pct=0.003,
 )
 
+def _get(t, k, default=None):
+    # Trade may be a dict or a dataclass instance
+    if isinstance(t, dict):
+        return t.get(k, default)
+    return getattr(t, k, default)
+
 try:
     result = run_strategy_backtest(config)
-    # Extract key metrics
-    metrics = result.get("metrics", {{}})
-    trades = result.get("trades", [])
+    if result is None:
+        # Strategy returned None (typically: no trades generated)
+        output = {{
+            "total_trades": 0, "win_rate": 0, "profit_factor": 0,
+            "sharpe": 0, "max_drawdown": 0, "total_return": 0,
+            "avg_hold_days": 0, "avg_win": 0, "avg_loss": 0,
+            "n_long": 0, "n_short": 0, "win_trades": [],
+            "note": "no_trades",
+        }}
+    else:
+        # Extract key metrics
+        metrics = result.get("metrics", {{}}) if isinstance(result, dict) else {{}}
+        trades = result.get("trades", []) if isinstance(result, dict) else []
 
-    output = {{
-        "total_trades": metrics.get("total_trades", 0),
-        "win_rate": metrics.get("win_rate", 0),
-        "profit_factor": metrics.get("profit_factor", 0),
-        "sharpe": metrics.get("sharpe", 0),
-        "max_drawdown": metrics.get("max_drawdown", 0),
-        "total_return": metrics.get("total_return", 0),
-        "avg_hold_days": metrics.get("avg_hold_days", 0),
-        "avg_win": metrics.get("avg_win", 0),
-        "avg_loss": metrics.get("avg_loss", 0),
-        "n_long": sum(1 for t in trades if t.direction == "LONG"),
-        "n_short": sum(1 for t in trades if t.direction == "SHORT"),
-        "win_trades": [{{
-            "direction": t.direction,
-            "entry_date": t.entry_date,
-            "exit_date": t.exit_date,
-            "pnl_pct": round(t.pnl_pct, 4),
-            "exit_reason": t.exit_reason,
-            "hold_days": t.hold_days,
-        }} for t in trades],
-    }}
-    print(json.dumps(output))
+        def _num(x):
+            try:
+                import numpy as _np
+                if hasattr(x, 'item'):
+                    return x.item()
+            except Exception:
+                pass
+            return x
+
+        output = {{
+            "total_trades": metrics.get("total_trades", 0),
+            "win_rate": _num(metrics.get("win_rate", 0)),
+            "profit_factor": _num(metrics.get("profit_factor", 0)),
+            "sharpe": _num(metrics.get("sharpe", 0)),
+            "max_drawdown": _num(metrics.get("max_drawdown", 0)),
+            "total_return": _num(metrics.get("total_return", 0)),
+            "avg_hold_days": _num(metrics.get("avg_hold_days", 0)),
+            "avg_win": _num(metrics.get("avg_win", 0)),
+            "avg_loss": _num(metrics.get("avg_loss", 0)),
+            "n_long": sum(1 for t in trades if _get(t, "direction") == "LONG"),
+            "n_short": sum(1 for t in trades if _get(t, "direction") == "SHORT"),
+            "win_trades": [{{
+                "direction": _get(t, "direction"),
+                "entry_date": _get(t, "entry_date"),
+                "exit_date": _get(t, "exit_date"),
+                "pnl_pct": round(float(_get(t, "pnl_pct", 0) or 0), 4),
+                "exit_reason": _get(t, "exit_reason"),
+                "hold_days": _get(t, "hold_days"),
+            }} for t in trades],
+        }}
+    print(json.dumps(output, default=float))
 except Exception as e:
-    print(json.dumps({{"error": str(e)}}))
+    import traceback
+    print(json.dumps({{"error": str(e), "tb": traceback.format_exc()[-500:]}}))
 """
     try:
         result = subprocess.run(
@@ -230,8 +256,8 @@ def backtest_all(
         report["backtests"][key] = result
 
         if result:
-            wr = result.get("win_rate", 0)
-            sharpe = result.get("sharpe", 0)
+            wr = float(result.get("win_rate") or 0)
+            sharpe = float(result.get("sharpe") or 0)
             trades = result.get("total_trades", 0)
             logger.info(f"  {cfg.name}: {trades} trades, WR={wr:.0%}, Sharpe={sharpe:.2f}")
 
@@ -295,9 +321,13 @@ def main():
         if result is None:
             print(f"  {cfg.name:<15} FAILED")
             continue
-        print(f"  {cfg.name:<13} {result['total_trades']:>6} "
-              f"{result['win_rate']:>5.0%} {result['sharpe']:>7.2f} "
-              f"{result['total_return']:>7.1%} {result['max_drawdown']:>6.1%}")
+        wr = float(result.get("win_rate") or 0)
+        sh = float(result.get("sharpe") or 0)
+        tr = float(result.get("total_return") or 0)
+        dd = float(result.get("max_drawdown") or 0)
+        print(f"  {cfg.name:<13} {result.get('total_trades', 0):>6} "
+              f"{wr:>5.0%} {sh:>7.2f} "
+              f"{tr:>7.1%} {dd:>6.1%}")
 
     port = report.get("portfolio", {})
     if port and port.get("total_trades", 0) > 0:

@@ -251,7 +251,30 @@ def run_strategy_backtest(config: TradeConfig = None):
     # Compute metrics
     if not all_trades:
         print("\nNo trades generated. Try lowering confidence_threshold.")
-        return
+        return {
+            "config": {
+                "confidence_threshold": config.confidence_threshold,
+                "stop_loss_pct": config.stop_loss_pct,
+                "max_hold_days": config.max_hold_days,
+                "kelly_fraction": config.kelly_fraction,
+                "allow_short": config.allow_short,
+                "scale_in": config.scale_in,
+            },
+            "metrics": {
+                "total_trades": 0,
+                "win_rate": 0,
+                "avg_win": 0,
+                "avg_loss": 0,
+                "profit_factor": 0,
+                "kelly_size": 0,
+                "total_return": 0,
+                "cagr": 0,
+                "max_drawdown": 0,
+                "sharpe": 0,
+            },
+            "trades": [],
+            "note": "no_trades_generated",
+        }
 
     pnls = [t.pnl_pct for t in all_trades]
     wins = [p for p in pnls if p > 0]
