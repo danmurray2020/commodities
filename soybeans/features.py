@@ -124,14 +124,90 @@ def merge_enso_data(df, enso_path=str(DATA_DIR / "enso.csv")):
     return df
 
 
+def merge_usda_crop_progress(df, usda_path=str(DATA_DIR / "usda_crop_progress.csv")):
+    """Merge USDA NASS crop progress + condition data into the daily index.
+
+    The CSV is produced by ``tools/fetch_usda.py`` (which needs USDA_API_KEY
+    set — see https://quickstats.nass.usda.gov/api). It contains weekly
+    rows like:
+        commodity_desc | short_desc                              | week_ending | Value
+        SOYBEANS       | SOYBEANS - PROGRESS, MEASURED IN PCT PLANTED | 2024-05-12  | 35
+        SOYBEANS       | SOYBEANS - CONDITION, MEASURED IN PCT GOOD   | 2024-06-09  | 67
+        ...
+
+    We pivot it to one column per (commodity, metric), forward-fill weekly
+    values across the daily index (USDA reports Mondays), and add several
+    derived features that are typically more predictive than raw levels:
+      - {col}_yoy_diff      year-over-year change (compares to same week last year)
+      - {col}_5y_z          z-score vs the trailing 5-year mean for that calendar week
+
+    If the CSV doesn't exist (no API key, fetcher not run), this is a
+    no-op so the rest of the pipeline still works.
+    """
+    try:
+        usda = pd.read_csv(usda_path)
+    except FileNotFoundError:
+        return df
+    if usda.empty or "week_ending" not in usda.columns:
+        return df
+
+    usda["week_ending"] = pd.to_datetime(usda["week_ending"], errors="coerce")
+    usda = usda.dropna(subset=["week_ending", "Value"])
+
+    # Build a friendly column name from short_desc
+    def _slugify(s: str) -> str:
+        return (
+            s.lower()
+            .replace("soybeans -", "soy")
+            .replace("progress, measured in pct", "pct")
+            .replace("condition, measured in pct", "cond")
+            .replace(",", "")
+            .strip()
+            .replace("  ", " ")
+            .replace(" ", "_")
+        )
+
+    usda["metric"] = usda["short_desc"].astype(str).map(_slugify)
+
+    # Pivot: one column per metric, indexed by week_ending
+    wide = usda.pivot_table(
+        index="week_ending", columns="metric", values="Value", aggfunc="last"
+    )
+
+    # Reindex to df.index, forward-fill weekly values across daily rows
+    wide = wide.reindex(df.index, method="ffill")
+
+    # Add derived features: YoY diff and 5-year z-score per calendar week.
+    # These tend to be more predictive than absolute levels because crop
+    # progress is highly seasonal and the model already sees the date.
+    for col in list(wide.columns):
+        series = wide[col]
+        # YoY diff (252 trading days back)
+        wide[f"{col}_yoy_diff"] = series - series.shift(252)
+        # 5-year (1260 trading days) z-score
+        roll_mean = series.shift(1).rolling(1260, min_periods=252).mean()
+        roll_std = series.shift(1).rolling(1260, min_periods=252).std()
+        wide[f"{col}_5y_z"] = (series - roll_mean) / roll_std
+
+    # Avoid colliding with existing columns
+    new_cols = [c for c in wide.columns if c not in df.columns]
+    if not new_cols:
+        return df
+
+    df = df.join(wide[new_cols], how="left")
+    df[new_cols] = df[new_cols].ffill(limit=10)
+    return df
+
+
 def prepare_dataset(csv_path=str(DATA_DIR / "combined_features.csv"), horizon=63,
-                    use_cot=True, use_weather=True, use_enso=True):
+                    use_cot=True, use_weather=True, use_enso=True, use_usda=True):
     df = pd.read_csv(csv_path, index_col=0, parse_dates=True)
     df = add_price_features(df)
     df = add_regime_features(df, price_col="soybeans_close")
     if use_cot: df = merge_cot_data(df)
     if use_weather: df = merge_weather_data(df)
     if use_enso: df = merge_enso_data(df)
+    if use_usda: df = merge_usda_crop_progress(df)
     df = build_target(df, horizon=horizon)
     df = df.ffill()
     df = df.dropna()
