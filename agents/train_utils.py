@@ -243,6 +243,11 @@ def reg_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
     dir_acc_overlapping gives n≈test_size samples per fold, restoring
     meaningful optimization. The honest non-overlapping metrics are still
     computed and reported in production_metadata.json for evaluation.
+
+    DIVERSITY PENALTY: also rejects trials whose predicted returns have
+    near-zero variance — same rationale as the classifier objective. A
+    constant regressor wins on direction accuracy in regime-persistent
+    data but provides no useful sizing signal for trading.
     """
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 800),
@@ -261,6 +266,7 @@ def reg_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
     from xgboost import XGBRegressor
 
     fold_scores = []
+    fold_pred_stds = []
     for train_idx, test_idx in splits:
         val_size = min(63, len(train_idx) // 5)
         fit_idx, val_idx = train_idx[:-val_size], train_idx[-val_size:]
@@ -268,11 +274,21 @@ def reg_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
         model.fit(X[fit_idx], y[fit_idx],
                   eval_set=[(X[val_idx], y[val_idx])], verbose=False)
         preds = model.predict(X[test_idx])
+        fold_pred_stds.append(float(np.std(preds)))
 
         # Use overlapping directional accuracy as the objective metric.
         # See docstring above for rationale.
         metrics = evaluate_predictions(y[test_idx], preds, horizon=horizon)
         fold_scores.append(metrics["dir_acc_overlapping"])
+
+    # Reject constant-predictor trials (same rationale as classifier).
+    # We need varying outputs to size trades meaningfully.
+    avg_pred_std = float(np.mean(fold_pred_stds))
+    # Threshold expressed relative to typical 63-day return std (~10%) —
+    # any model whose predictions vary by less than 0.5% absolute return
+    # is essentially constant for trading purposes.
+    if avg_pred_std < 0.005:
+        return -1.0
 
     return float(np.mean(fold_scores) - 0.5 * np.std(fold_scores))
 
@@ -285,6 +301,16 @@ def clf_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
     {0, 0.25, 0.5, 0.75, 1.0}) for Optuna to optimize meaningfully.
     Overlapping accuracy on n≈test_size per fold has the resolution
     Optuna needs.
+
+    DIVERSITY PENALTY: also rejects trials whose predict_proba is
+    near-constant. The previous mean - 0.5*std objective reliably
+    selected constant predictors on regime-persistent commodities
+    (e.g. Cocoa where recent 252 days are 98% DOWN — a model that
+    just predicts DOWN every day scores 75% mean accuracy with 0
+    std, which beats any varying model). For TRADING we need a
+    classifier whose confidence varies day-to-day so we can pick
+    the high-conviction subset; a constant predictor gives no
+    actionable signal regardless of its accuracy.
     """
     params = {
         "n_estimators": trial.suggest_int("n_estimators", 100, 800),
@@ -303,6 +329,7 @@ def clf_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
     from xgboost import XGBClassifier
 
     fold_scores = []
+    fold_proba_stds = []
     for train_idx, test_idx in splits:
         val_size = min(63, len(train_idx) // 5)
         fit_idx, val_idx = train_idx[:-val_size], train_idx[-val_size:]
@@ -314,8 +341,17 @@ def clf_objective_spearman(trial, X, y, splits, horizon=63, max_depth_max: int =
         model.fit(X[fit_idx], y[fit_idx],
                   eval_set=[(X[val_idx], y[val_idx])], verbose=False)
         preds = model.predict(X[test_idx])
+        proba_up = model.predict_proba(X[test_idx])[:, 1]
+        fold_proba_stds.append(float(proba_up.std()))
 
         metrics = evaluate_classification(y[test_idx], preds, horizon=horizon)
         fold_scores.append(metrics["acc_overlapping"])
+
+    # Reject constant-predictor trials. We want at least some variance in
+    # predict_proba across the test fold — otherwise the model gives us no
+    # actionable signal for trading.
+    avg_proba_std = float(np.mean(fold_proba_stds))
+    if avg_proba_std < 0.01:
+        return -1.0
 
     return float(np.mean(fold_scores) - 0.5 * np.std(fold_scores))

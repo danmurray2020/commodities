@@ -34,16 +34,16 @@
   },
   "regression": {
     "params": {
-      "n_estimators": 711,
-      "max_depth": 6,
-      "learning_rate": 0.00856985568802685,
-      "subsample": 0.6028601408976861,
-      "colsample_bytree": 0.7456543234354926,
-      "min_child_weight": 6,
-      "gamma": 0.9470943767467414,
-      "reg_alpha": 9.533445784932125e-05,
-      "reg_lambda": 0.040251847013907986,
-      "max_delta_step": 4.745650074292851
+      "n_estimators": 766,
+      "max_depth": 3,
+      "learning_rate": 0.02504396611073352,
+      "subsample": 0.6269837569296466,
+      "colsample_bytree": 0.4703809598987544,
+      "min_child_weight": 24,
+      "gamma": 2.1152072691212314,
+      "reg_alpha": 8.343316877096819e-06,
+      "reg_lambda": 1.0399571606330687e-08,
+      "max_delta_step": 4.1298482497949
     },
     "fold_spearman": [
       0.0,
@@ -57,89 +57,89 @@
       0.5,
       0.75,
       1.0,
-      0.75,
-      0.5
+      0.25,
+      0.25
     ],
-    "avg_dir_acc_independent": 0.7,
+    "avg_dir_acc_independent": 0.55,
     "fold_dir_acc_overlapping": [
       0.5079,
-      0.5238,
+      0.75,
       0.9524,
-      0.7579,
-      0.254
+      0.4563,
+      0.1944
     ],
-    "avg_dir_acc_overlapping": 0.5992,
+    "avg_dir_acc_overlapping": 0.5722,
     "fold_accuracies": [
       0.5,
       0.75,
       1.0,
-      0.75,
-      0.5
+      0.25,
+      0.25
     ],
-    "avg_accuracy": 0.7,
-    "std_accuracy": 0.18708286933869706,
+    "avg_accuracy": 0.55,
+    "std_accuracy": 0.291547594742265,
     "fold_maes": [
-      0.060971,
-      0.087832,
-      0.289038,
-      0.183478,
-      0.339752
+      0.064784,
+      0.082328,
+      0.28174,
+      0.196357,
+      0.344981
     ],
     "fold_rmses": [
-      0.071744,
-      0.106175,
-      0.376733,
-      0.224812,
-      0.400391
+      0.076263,
+      0.098033,
+      0.370962,
+      0.237119,
+      0.405293
     ],
-    "avg_mae": 0.1922142,
-    "avg_rmse": 0.235971,
+    "avg_mae": 0.194038,
+    "avg_rmse": 0.237534,
     "test_size": 252
   },
   "classification": {
     "params": {
-      "n_estimators": 420,
-      "max_depth": 3,
-      "learning_rate": 0.018838273742000363,
-      "subsample": 0.9164697626775499,
-      "colsample_bytree": 0.672629893997126,
-      "min_child_weight": 11,
-      "gamma": 6.917452862899023,
-      "reg_alpha": 0.6471557280501484,
-      "reg_lambda": 5.566237491455445e-05,
-      "max_delta_step": 0.00884861508944898
+      "n_estimators": 264,
+      "max_depth": 5,
+      "learning_rate": 0.006692445961801435,
+      "subsample": 0.5055714318852558,
+      "colsample_bytree": 0.7042807153044683,
+      "min_child_weight": 8,
+      "gamma": 1.5286612302748976,
+      "reg_alpha": 0.0020303666266451893,
+      "reg_lambda": 0.30469823141327396,
+      "max_delta_step": 0.4918030637029929
     },
     "fold_acc_independent": [
-      0.5,
       0.75,
-      1.0,
+      0.75,
+      0.0,
       0.75,
       0.75
     ],
-    "avg_acc_independent": 0.75,
+    "avg_acc_independent": 0.6,
     "fold_acc_overlapping": [
-      0.4921,
-      0.75,
-      0.9524,
-      0.5437,
-      0.8333
+      0.6071,
+      0.5119,
+      0.0476,
+      0.8016,
+      0.5992
     ],
-    "avg_acc_overlapping": 0.7142999999999999,
+    "avg_acc_overlapping": 0.51348,
     "fold_accuracies": [
-      0.5,
       0.75,
-      1.0,
+      0.75,
+      0.0,
       0.75,
       0.75
     ],
-    "avg_accuracy": 0.75,
-    "std_accuracy": 0.15811388300841897
+    "avg_accuracy": 0.6,
+    "std_accuracy": 0.30000000000000004
   },
   "holdout": {
     "size": 126,
     "reg_direction_accuracy": 0.0,
     "reg_spearman": 0.0,
-    "reg_mae": 0.665496,
-    "clf_accuracy": 1.0
+    "reg_mae": 0.673282,
+    "clf_accuracy": 0.0
   }
 }
