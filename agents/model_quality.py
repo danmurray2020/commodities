@@ -125,10 +125,26 @@ def diagnose_commodity(cfg: CommodityConfig) -> dict:
     ho_spearman = holdout.get("reg_spearman")
     fold_accs = reg.get("fold_accuracies", [])
 
+    # ── Sample-size confidence ──────────────────────────────────────────
+    # The reported reg_acc is computed on non-overlapping samples
+    # (test_size // horizon points per fold). With the default
+    # test_size=252 and horizon=63 that's only 4 points per fold and
+    # ~20 across all 5 folds — far too few for any direction-accuracy
+    # value to be statistically meaningful. Below ~30 total samples
+    # the metric is noise, and "anti-predictive" findings are spurious.
+    test_size = reg.get("test_size") or 252  # default in train_utils
+    n_folds = max(len(fold_accs), 1)
+    n_indep_per_fold = max(1, test_size // max(horizon, 1))
+    n_indep_total = n_indep_per_fold * n_folds
+    low_confidence = n_indep_total < 30
+
     diag["metrics"] = {
         "reg_acc": reg_acc, "reg_std": reg_std, "reg_spearman": reg_spearman,
         "clf_acc": clf_acc, "holdout_reg": ho_reg, "holdout_spearman": ho_spearman,
         "horizon": horizon, "n_features": n_features,
+        "n_independent_per_fold": n_indep_per_fold,
+        "n_independent_total": n_indep_total,
+        "low_confidence_metrics": low_confidence,
     }
 
     # ── Load history to avoid repeating failed strategies ──
@@ -171,25 +187,42 @@ def diagnose_commodity(cfg: CommodityConfig) -> dict:
     # ── Issue detection ──
 
     # 1. Below-random regression direction
+    # Suppressed when sample size is too small to be meaningful — with n<30
+    # total non-overlapping points the metric is just noise, and a "below
+    # random" reading on 4 points/fold can be pure luck. We surface a
+    # different finding ("insufficient_sample") in that case so the user
+    # knows the model is unmeasurable rather than anti-predictive.
     if reg_acc is not None and reg_acc < 0.50:
-        diag["issues"].append(f"Regression direction accuracy ({reg_acc:.1%}) below random")
-        diag["status"] = "poor"
+        if low_confidence:
+            diag["issues"].append(
+                f"Insufficient sample for reliable reg_acc "
+                f"(n={n_indep_total} non-overlapping points, "
+                f"reading was {reg_acc:.1%} but unreliable)"
+            )
+            if diag["status"] == "ok":
+                diag["status"] = "low_confidence"
+        else:
+            diag["issues"].append(f"Regression direction accuracy ({reg_acc:.1%}) below random")
+            diag["status"] = "poor"
 
-        next_h = pick_horizon()
-        if next_h and next_h != horizon:
+            next_h = pick_horizon()
+            if next_h and next_h != horizon:
+                diag["actions"].append({
+                    "action": "try_shorter_horizon",
+                    "param": next_h,
+                    "reason": f"Trying horizon={next_h}d (current {horizon}d below random, "
+                              f"previously tried: {sorted(tried_horizons) or 'none'})",
+                })
             diag["actions"].append({
-                "action": "try_shorter_horizon",
-                "param": next_h,
-                "reason": f"Trying horizon={next_h}d (current {horizon}d below random, "
-                          f"previously tried: {sorted(tried_horizons) or 'none'})",
+                "action": "increase_regularization",
+                "reason": "Model may be overfitting to training regime",
             })
-        diag["actions"].append({
-            "action": "increase_regularization",
-            "reason": "Model may be overfitting to training regime",
-        })
 
     # 2. High fold variance
-    if reg_std is not None and reg_std > 0.15:
+    # Also unreliable on tiny samples — with 4 points per fold the std
+    # of fold-level accuracies is dominated by sample variance, not real
+    # model instability.
+    if reg_std is not None and reg_std > 0.15 and not low_confidence:
         diag["issues"].append(f"High fold variance (std={reg_std:.1%})")
         if "poor" not in diag["status"]:
             diag["status"] = "unstable"
@@ -199,7 +232,10 @@ def diagnose_commodity(cfg: CommodityConfig) -> dict:
         })
 
     # 3. Perfect folds (overfitting signal)
-    if fold_accs and any(a >= 0.99 for a in fold_accs):
+    # Skip when low_confidence: with n=4 per fold a "perfect" fold is just
+    # 4-of-4 by chance (1/16 ~ 6% of folds for a random model) — it's not
+    # an overfitting signal, it's a small-sample binomial fluke.
+    if fold_accs and any(a >= 0.99 for a in fold_accs) and not low_confidence:
         diag["issues"].append("Perfect fold detected (100%) — likely overfitting")
         diag["actions"].append({
             "action": "increase_regularization",
@@ -207,7 +243,10 @@ def diagnose_commodity(cfg: CommodityConfig) -> dict:
         })
 
     # 4. Collapsed folds (regime failure)
-    if fold_accs and any(a <= 0.10 for a in fold_accs):
+    # Same caveat: 0/4 happens to a random model 1/16 of the time. Skip
+    # the alarm under low_confidence; the n_independent_total finding
+    # already surfaces the real issue.
+    if fold_accs and any(a <= 0.10 for a in fold_accs) and not low_confidence:
         diag["issues"].append("Collapsed fold (<10%) — model failed in one regime")
         next_h = pick_horizon()
         if next_h and next_h != horizon:
