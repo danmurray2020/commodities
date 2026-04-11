@@ -1,0 +1,39 @@
+{
+  "commodity": "cotton",
+  "ticker": "CT=F",
+  "horizon": 5,
+  "features": [
+    "volatility_21d",
+    "trend_slope_126d",
+    "return_1d",
+    "macd_signal",
+    "vix",
+    "vol_regime_change",
+    "trend_slope_21d",
+    "sma_50_200_gap",
+    "sp500",
+    "us10y"
+  ],
+  "n_features": 10,
+  "purge_gap": 5,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.6308
+  },
+  "classification": {
+    "avg_accuracy": 0.4615
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "5d_lightgbm",
+    "model_type": "lightgbm",
+    "best_accuracy": 0.6308,
+    "promoted_at": "2026-04-11T16:35:16.008638+00:00"
+  }
+}

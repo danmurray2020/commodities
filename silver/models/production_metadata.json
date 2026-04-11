@@ -1,0 +1,39 @@
+{
+  "commodity": "silver",
+  "ticker": "SI=F",
+  "horizon": 21,
+  "features": [
+    "sma_50_200_cross",
+    "vol_regime_change",
+    "vol_regime",
+    "return_1d",
+    "return_5d",
+    "price_vs_sma_5",
+    "price_vs_sma_10",
+    "price_vs_sma_50",
+    "rsi_14",
+    "day_of_week"
+  ],
+  "n_features": 10,
+  "purge_gap": 21,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.62
+  },
+  "classification": {
+    "avg_accuracy": 0.34
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "21d_xgboost",
+    "model_type": "xgboost",
+    "best_accuracy": 0.62,
+    "promoted_at": "2026-04-11T16:35:16.003475+00:00"
+  }
+}

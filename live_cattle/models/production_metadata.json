@@ -1,0 +1,42 @@
+{
+  "commodity": "live_cattle",
+  "ticker": "LE=F",
+  "horizon": 10,
+  "features": [
+    "return_21d",
+    "price_vs_sma_200",
+    "drawdown_regime",
+    "pct_up_days_63d",
+    "vol_regime",
+    "vol_regime_change",
+    "season_cos_1",
+    "sma_50_200_gap",
+    "return_10d",
+    "zscore_252d",
+    "bb_pct",
+    "price_vs_sma_5",
+    "price_lag_2"
+  ],
+  "n_features": 13,
+  "purge_gap": 10,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.6462
+  },
+  "classification": {
+    "avg_accuracy": 0.6154
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "10d_lightgbm",
+    "model_type": "lightgbm",
+    "best_accuracy": 0.6462,
+    "promoted_at": "2026-04-11T16:35:16.006874+00:00"
+  }
+}

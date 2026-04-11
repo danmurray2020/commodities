@@ -1,0 +1,36 @@
+{
+  "commodity": "gold",
+  "ticker": "GC=F",
+  "horizon": 21,
+  "features": [
+    "price_vs_sma_21",
+    "macd_signal",
+    "macd_diff",
+    "price_vs_sma_10",
+    "return_10d",
+    "pct_up_days_21d",
+    "return_5d"
+  ],
+  "n_features": 7,
+  "purge_gap": 21,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.68
+  },
+  "classification": {
+    "avg_accuracy": 0.32
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "21d_xgboost",
+    "model_type": "xgboost",
+    "best_accuracy": 0.68,
+    "promoted_at": "2026-04-11T16:35:16.002634+00:00"
+  }
+}

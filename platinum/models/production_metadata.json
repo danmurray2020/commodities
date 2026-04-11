@@ -1,0 +1,47 @@
+{
+  "commodity": "platinum",
+  "ticker": "PL=F",
+  "horizon": 21,
+  "features": [
+    "trend_slope_63d",
+    "sma_5",
+    "return_10d",
+    "pct_up_days_21d",
+    "sma_21",
+    "vix",
+    "pct_up_days_126d",
+    "bb_high",
+    "drawdown",
+    "return_1d",
+    "price_vs_sma_5",
+    "momentum_rank_252d",
+    "price_vs_sma_21",
+    "zscore_252d",
+    "price_lag_1",
+    "price_vs_sma_200",
+    "price_lag_3",
+    "regime_uncertainty"
+  ],
+  "n_features": 18,
+  "purge_gap": 21,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.64
+  },
+  "classification": {
+    "avg_accuracy": 0.66
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "21d_ridge",
+    "model_type": "ridge",
+    "best_accuracy": 0.64,
+    "promoted_at": "2026-04-11T16:35:16.004584+00:00"
+  }
+}

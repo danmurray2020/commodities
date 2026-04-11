@@ -1,0 +1,49 @@
+{
+  "commodity": "lumber",
+  "ticker": "LBR=F",
+  "horizon": 10,
+  "features": [
+    "sma_50_200_gap",
+    "rsi_14",
+    "return_21d",
+    "trend_slope_21d",
+    "price_vs_sma_50",
+    "bb_pct",
+    "vol_regime",
+    "price_vs_sma_21",
+    "price_vs_sma_5",
+    "mean_reversion_pressure",
+    "bb_high",
+    "price_vs_sma_10",
+    "momentum_rank_252d",
+    "return_10d",
+    "sma_10",
+    "macd_signal",
+    "return_1d",
+    "price_lag_5",
+    "return_5d",
+    "bb_low"
+  ],
+  "n_features": 20,
+  "purge_gap": 10,
+  "strategy": {
+    "confidence_threshold": 0.7,
+    "stop_loss_pct": 0.1,
+    "take_profit_multiplier": 1.0,
+    "max_hold_days": 63,
+    "allow_short": true
+  },
+  "regression": {
+    "avg_accuracy": 0.6
+  },
+  "classification": {
+    "avg_accuracy": 0.4769
+  },
+  "promoted_from_ensemble": {
+    "source_metadata": "ensemble_metadata.json",
+    "best_model": "10d_lightgbm",
+    "model_type": "lightgbm",
+    "best_accuracy": 0.6,
+    "promoted_at": "2026-04-11T16:35:16.009527+00:00"
+  }
+}
