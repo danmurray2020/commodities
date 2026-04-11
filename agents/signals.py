@@ -25,7 +25,7 @@ Usage:
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 SIGNALS_LOG = Path(__file__).parent.parent / "logs" / "agent_signals.jsonl"
@@ -121,7 +121,7 @@ def get_signals(
 
     severity_order = {"low": 0, "medium": 1, "high": 2, "critical": 3}
     min_sev = severity_order.get(min_severity, 0)
-    cutoff = datetime.now() - timedelta(hours=since_hours)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=since_hours)
 
     signals = []
     with open(SIGNALS_LOG) as f:
@@ -132,6 +132,9 @@ def get_signals(
                 continue
 
             ts = datetime.fromisoformat(s.get("timestamp", "2000-01-01"))
+            # Older log entries may be tz-naive — assume UTC for comparison
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
             if ts < cutoff:
                 continue
             if commodity and s.get("commodity") != commodity:

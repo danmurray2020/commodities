@@ -39,6 +39,15 @@ class CommoditiesDB:
             _local.conn.execute("PRAGMA foreign_keys=ON")
         return _local.conn
 
+    @property
+    def conn(self) -> sqlite3.Connection:
+        """Public alias for the thread-local connection.
+
+        Lets callers do `db.conn.execute(...)` directly without poking at
+        the private `_get_conn()` method.
+        """
+        return self._get_conn()
+
     def _ensure_schema(self):
         """Create tables if they don't exist."""
         schema = SCHEMA_PATH.read_text()

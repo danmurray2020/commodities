@@ -404,6 +404,8 @@ def run_strategy_backtest(config: TradeConfig = None):
 
     plt.show()
 
+    return results
+
 
 def run_parameter_sweep():
     """Sweep key strategy parameters to find optimal configuration."""

@@ -93,14 +93,17 @@ EQUITY_MAP = {
 }
 
 
-def generate_equity_signals(commodity_predictions: dict, min_confidence: float = 0.60,
+def generate_equity_signals(commodity_predictions: dict, min_confidence: float = None,
                             min_beta: float = 0.5) -> list[dict]:
     """Generate equity trade signals from commodity predictions.
 
     Args:
         commodity_predictions: Dict of {commodity_key: prediction_dict} with
             keys: direction, confidence, pred_return, agreement, price.
-        min_confidence: Minimum commodity prediction confidence to trigger equity trade.
+        min_confidence: Floor confidence override. If None (default), each
+            commodity must clear its own ``CommodityConfig.confidence_threshold``,
+            so equity overlays can never fire on a signal that the futures
+            engine itself rejected.
         min_beta: Minimum equity beta to commodity to consider.
 
     Returns:
@@ -109,7 +112,16 @@ def generate_equity_signals(commodity_predictions: dict, min_confidence: float =
     signals = []
 
     for key, pred in commodity_predictions.items():
-        if pred is None or pred.get("confidence", 0) < min_confidence:
+        if pred is None:
+            continue
+        # Per-commodity confidence gate — same threshold the futures
+        # strategy layer uses. The flat ``min_confidence`` arg only acts as
+        # an override floor when explicitly set by the caller.
+        cfg = COMMODITIES.get(key)
+        threshold = cfg.confidence_threshold if cfg is not None else 0.75
+        if min_confidence is not None and min_confidence > threshold:
+            threshold = min_confidence
+        if pred.get("confidence", 0) < threshold:
             continue
 
         equities = EQUITY_MAP.get(key, [])
@@ -210,7 +222,11 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description="Generate equity trade signals")
     parser.add_argument("--backtest", action="store_true", help="Run equity backtest")
-    parser.add_argument("--min-confidence", type=float, default=0.60)
+    parser.add_argument(
+        "--min-confidence", type=float, default=None,
+        help="Optional override floor. By default each commodity uses its "
+             "own confidence_threshold from agents/config.py.",
+    )
     parser.add_argument("--min-beta", type=float, default=0.5)
     args = parser.parse_args()
 

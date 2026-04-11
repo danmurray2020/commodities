@@ -133,6 +133,13 @@ def merge_macro_data(df,
     # --- FRED macro data ---
     try:
         macro = pd.read_csv(macro_path, index_col=0, parse_dates=True)
+        # Drop columns already present in df (e.g. usd_index is sometimes
+        # fetched as supplementary data and stored in combined_features.csv).
+        # Without this dedup the join raises:
+        #   "columns overlap but no suffix specified: Index(['usd_index'])"
+        overlap = [c for c in macro.columns if c in df.columns]
+        if overlap:
+            macro = macro.drop(columns=overlap)
         df = df.join(macro, how="left")
         macro_cols = [c for c in macro.columns if c in df.columns]
         df[macro_cols] = df[macro_cols].ffill()
@@ -142,6 +149,9 @@ def merge_macro_data(df,
     # --- China PMI ---
     try:
         pmi = pd.read_csv(pmi_path, index_col=0, parse_dates=True)
+        overlap = [c for c in pmi.columns if c in df.columns]
+        if overlap:
+            pmi = pmi.drop(columns=overlap)
         df = df.join(pmi, how="left")
         if "china_pmi" in df.columns:
             df["china_pmi"] = df["china_pmi"].ffill()

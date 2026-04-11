@@ -9,7 +9,9 @@ from agents.retry import download_with_retry
 DATA_DIR = Path(__file__).parent / "data"
 
 
-def fetch_prices(ticker: str = "LBS=F", period: str = "10y") -> pd.DataFrame:
+def fetch_prices(ticker: str = "LBR=F", period: str = "10y") -> pd.DataFrame:
+    # NOTE: switched from LBS=F (small lumber, delisted by Yahoo around 2023)
+    # to LBR=F (Random Length Lumber futures), which yfinance still serves.
     print(f"Fetching {ticker} data for the last {period}...")
     df = download_with_retry(ticker, period=period)
     df.index.name = "Date"

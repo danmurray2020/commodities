@@ -121,7 +121,9 @@ COMMODITIES = {
         dir_name="cotton", confidence_threshold=0.70,
     ),
     "lumber": CommodityConfig(
-        name="Lumber", ticker="LBS=F", price_col="lumber_close",
+        # LBS=F (small lumber) was delisted by Yahoo ~2023; LBR=F is the
+        # active Random Length Lumber futures contract.
+        name="Lumber", ticker="LBR=F", price_col="lumber_close",
         dir_name="lumber", confidence_threshold=0.70,
     ),
     "oj": CommodityConfig(

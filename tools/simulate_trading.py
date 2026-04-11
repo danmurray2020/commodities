@@ -200,6 +200,18 @@ print(json.dumps({{"rows": len(df), "cols": len(df.columns)}}))
     if start_idx < 252:
         start_idx = 252  # need at least 1 year of history
 
+    # Bail out if there isn't enough history left to simulate.
+    # Without this clamp, dates[start_idx] raises IndexError when
+    # start_idx >= len(df) (e.g. start_date past the last row, or df has
+    # fewer than 252 rows total).
+    if start_idx >= len(df):
+        return {
+            "commodity": key,
+            "status": "insufficient_history",
+            "error": f"start_idx={start_idx} >= rows={len(df)}; need ≥252 rows of history",
+            "trades": [],
+        }
+
     prices = df[price_col].values
     dates = df.index
 
