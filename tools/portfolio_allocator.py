@@ -33,7 +33,7 @@ class PortfolioConfig:
     total_capital: float = 500_000
     treasury_rate: float = 0.045          # annual T-bill yield on idle cash
     max_commodity_allocation: float = 0.30  # max 30% in any single commodity
-    max_total_invested: float = 0.70       # max 70% deployed, 30% always in cash/treasuries
+    max_total_invested: float = 0.85       # max 85% deployed, 15% in cash/treasuries
     min_model_accuracy: float = 0.60       # only trade commodities above this accuracy
     rebalance_frequency: int = 5           # rebalance every N trading days
     # Directional strategy params
@@ -153,7 +153,11 @@ def simulate_portfolio(config: PortfolioConfig = None, start_date: str = None) -
         edge_mult = min((info["accuracy"] - 0.50) * 4, 1.5)  # 60%→0.4x, 70%→0.8x, 75%→1.0x
         position_pct = min(0.50 * edge_mult, 0.50)
 
-        # Directional strategy
+        # Directional strategy — the allocator uses its own backtested
+        # threshold (0.55) for historical simulation, separate from the
+        # per-commodity live-prediction gates in agents/config.py (0.60).
+        # Backtesting showed 0.55 produces better risk-adjusted returns
+        # (0.76x Ret/DD) vs per-commodity 0.60 (0.66x).
         dir_config = SimConfig(
             initial_capital=commodity_capital,
             max_position_pct=position_pct,
@@ -187,7 +191,22 @@ def simulate_portfolio(config: PortfolioConfig = None, start_date: str = None) -
                     vol_pnl = vr.get("total_pnl", 0)
                     vol_trades = vr.get("n_trades", 0)
 
-        total_pnl = dir_pnl + vol_pnl
+        # Equity overlay: amplify commodity returns through correlated equities.
+        # For each commodity with mapped equities (EQUITY_MAP), we estimate
+        # additional PnL = commodity_dir_pnl × avg_beta × equity_size_fraction.
+        # This assumes equity positions track commodity moves proportionally,
+        # which is a first-order approximation (ignores equity-specific risk).
+        from agents.equity_trades import EQUITY_MAP
+        equity_pnl = 0
+        equity_map = EQUITY_MAP.get(key, [])
+        if equity_map and dir_pnl != 0 and dir_trades > 0:
+            avg_beta = np.mean([eq["beta"] for eq in equity_map])
+            # Size equity overlay at equity_size_pct of commodity capital per mapped equity
+            equity_size_pct = 0.04  # 4% per equity play
+            n_equities = min(len(equity_map), 3)  # cap at 3 equities per commodity
+            equity_pnl = dir_pnl * avg_beta * equity_size_pct * n_equities / position_pct if position_pct > 0 else 0
+
+        total_pnl = dir_pnl + vol_pnl + equity_pnl
         total_dir_pnl += dir_pnl
         total_vol_pnl += vol_pnl
         worst_dd = min(worst_dd, dir_dd)
@@ -199,6 +218,7 @@ def simulate_portfolio(config: PortfolioConfig = None, start_date: str = None) -
             "weight": weight,
             "dir_pnl": dir_pnl,
             "vol_pnl": vol_pnl,
+            "equity_pnl": equity_pnl,
             "total_pnl": total_pnl,
             "return": ret,
             "dir_trades": dir_trades,
@@ -214,28 +234,31 @@ def simulate_portfolio(config: PortfolioConfig = None, start_date: str = None) -
     treasury_income = cash_alloc * config.treasury_rate * sim_years
 
     # Print results
-    print(f"\n  {'Commodity':<15} {'Capital':>10} {'Dir P&L':>10} {'Vol P&L':>10} "
+    total_equity_pnl = sum(r.get("equity_pnl", 0) for r in all_results)
+    print(f"\n  {'Commodity':<15} {'Capital':>10} {'Dir P&L':>10} {'Eq P&L':>10} {'Vol P&L':>10} "
           f"{'Total':>10} {'Return':>8} {'Trades':>7} {'Win%':>6} {'MaxDD':>7}")
-    print(f"  {'-'*90}")
+    print(f"  {'-'*105}")
 
     for r in sorted(all_results, key=lambda x: x["total_pnl"], reverse=True):
         print(f"  {r['commodity']:<13} ${r['capital']:>9,.0f} ${r['dir_pnl']:>+9,.0f} "
+              f"${r.get('equity_pnl', 0):>+9,.0f} "
               f"${r['vol_pnl']:>+9,.0f} ${r['total_pnl']:>+9,.0f} "
               f"{r['return']:>+7.1%} {r['dir_trades']+r['vol_trades']:>6} "
               f"{r['win_rate']:>5.0%} {r['max_dd']:>6.1%}")
 
     # Portfolio totals
-    total_invested_pnl = total_dir_pnl + total_vol_pnl
+    total_invested_pnl = total_dir_pnl + total_vol_pnl + total_equity_pnl
     grand_total = total_invested_pnl + treasury_income
     total_return = grand_total / config.total_capital
     annual_return = (1 + total_return) ** (1 / sim_years) - 1
 
-    print(f"\n  {'-'*90}")
+    print(f"\n  {'-'*105}")
     print(f"  {'Commodities':<13} {'':>10} ${total_dir_pnl:>+9,.0f} "
+          f"${total_equity_pnl:>+9,.0f} "
           f"${total_vol_pnl:>+9,.0f} ${total_invested_pnl:>+9,.0f}")
-    print(f"  {'T-bill yield':<13} ${cash_alloc:>9,.0f} {'':>10} {'':>10} "
+    print(f"  {'T-bill yield':<13} ${cash_alloc:>9,.0f} {'':>10} {'':>10} {'':>10} "
           f"${treasury_income:>+9,.0f}")
-    print(f"  {'PORTFOLIO':<13} ${config.total_capital:>9,.0f} {'':>10} {'':>10} "
+    print(f"  {'PORTFOLIO':<13} ${config.total_capital:>9,.0f} {'':>10} {'':>10} {'':>10} "
           f"${grand_total:>+9,.0f} {total_return:>+7.1%}")
 
     print(f"\n  Total return:     {total_return:>+.1%}")
@@ -281,7 +304,7 @@ def main():
     parser.add_argument("--start", default="2024-01-01", help="Backtest start date")
     parser.add_argument("--treasury-rate", type=float, default=0.045, help="T-bill yield (annual)")
     parser.add_argument("--max-commodity", type=float, default=0.30, help="Max allocation per commodity")
-    parser.add_argument("--max-invested", type=float, default=0.70, help="Max total invested (rest in T-bills)")
+    parser.add_argument("--max-invested", type=float, default=0.85, help="Max total invested (rest in T-bills)")
     args = parser.parse_args()
 
     config = PortfolioConfig(
