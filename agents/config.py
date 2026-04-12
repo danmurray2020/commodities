@@ -42,25 +42,32 @@ class CommodityConfig:
 
 
 COMMODITIES = {
+    # ── Confidence thresholds ─────────────────────────────────────
+    # Uniform 60% gate across all commodities. The per-commodity
+    # thresholds (75-95%) were set when direction-accuracy metrics
+    # were inflated by n=4 noise. Now that models are honestly
+    # calibrated, most can't consistently output >70% predict_proba.
+    # 60% = "model is at least 60% confident about direction", which
+    # is a meaningful bar without being unreachable.
     "coffee": CommodityConfig(
         name="Coffee", ticker="KC=F", price_col="coffee_close",
-        dir_name="coffee", confidence_threshold=0.75, model_version="v3",
+        dir_name="coffee", confidence_threshold=0.60, model_version="v3",
     ),
     "cocoa": CommodityConfig(
         name="Cocoa", ticker="CC=F", price_col="cocoa_close",
-        dir_name="chocolate", confidence_threshold=0.80, model_version="v5",
+        dir_name="chocolate", confidence_threshold=0.60, model_version="v5",
     ),
     "sugar": CommodityConfig(
         name="Sugar", ticker="SB=F", price_col="sugar_close",
-        dir_name="sugar", confidence_threshold=0.75, model_version="v3",
+        dir_name="sugar", confidence_threshold=0.60, model_version="v3",
     ),
     "natgas": CommodityConfig(
         name="Natural Gas", ticker="NG=F", price_col="natgas_close",
-        dir_name="natgas", confidence_threshold=0.95, model_version="v3",
+        dir_name="natgas", confidence_threshold=0.60, model_version="v3",
     ),
     "soybeans": CommodityConfig(
         name="Soybeans", ticker="ZS=F", price_col="soybeans_close",
-        dir_name="soybeans", confidence_threshold=0.80, model_version="v3",
+        dir_name="soybeans", confidence_threshold=0.60, model_version="v3",
     ),
     "wheat": CommodityConfig(
         name="Wheat", ticker="ZW=F", price_col="wheat_close",
@@ -68,67 +75,67 @@ COMMODITIES = {
     ),
     "copper": CommodityConfig(
         name="Copper", ticker="HG=F", price_col="copper_close",
-        dir_name="copper", confidence_threshold=0.75, model_version="v5",
+        dir_name="copper", confidence_threshold=0.60, model_version="v5",
         horizon=63,
     ),
     # Energy
     "crude_oil": CommodityConfig(
         name="Crude Oil", ticker="CL=F", price_col="crude_oil_close",
-        dir_name="crude_oil", confidence_threshold=0.70,
+        dir_name="crude_oil", confidence_threshold=0.60,
     ),
     "heating_oil": CommodityConfig(
         name="Heating Oil", ticker="HO=F", price_col="heating_oil_close",
-        dir_name="heating_oil", confidence_threshold=0.70,
+        dir_name="heating_oil", confidence_threshold=0.60,
     ),
     "gasoline": CommodityConfig(
         name="Gasoline", ticker="RB=F", price_col="gasoline_close",
-        dir_name="gasoline", confidence_threshold=0.70,
+        dir_name="gasoline", confidence_threshold=0.60,
     ),
     # Precious metals
     "gold": CommodityConfig(
         name="Gold", ticker="GC=F", price_col="gold_close",
-        dir_name="gold", confidence_threshold=0.70,
+        dir_name="gold", confidence_threshold=0.60,
     ),
     "silver": CommodityConfig(
         name="Silver", ticker="SI=F", price_col="silver_close",
-        dir_name="silver", confidence_threshold=0.70,
+        dir_name="silver", confidence_threshold=0.60,
     ),
     "platinum": CommodityConfig(
         name="Platinum", ticker="PL=F", price_col="platinum_close",
-        dir_name="platinum", confidence_threshold=0.70,
+        dir_name="platinum", confidence_threshold=0.60,
     ),
     # Grains
     "corn": CommodityConfig(
         name="Corn", ticker="ZC=F", price_col="corn_close",
-        dir_name="corn", confidence_threshold=0.70,
+        dir_name="corn", confidence_threshold=0.60,
     ),
     "oats": CommodityConfig(
         name="Oats", ticker="ZO=F", price_col="oats_close",
-        dir_name="oats", confidence_threshold=0.70,
+        dir_name="oats", confidence_threshold=0.60,
     ),
     # Livestock
     "live_cattle": CommodityConfig(
         name="Live Cattle", ticker="LE=F", price_col="cattle_close",
-        dir_name="live_cattle", confidence_threshold=0.70,
+        dir_name="live_cattle", confidence_threshold=0.60,
     ),
     "lean_hogs": CommodityConfig(
         name="Lean Hogs", ticker="HE=F", price_col="hogs_close",
-        dir_name="lean_hogs", confidence_threshold=0.70,
+        dir_name="lean_hogs", confidence_threshold=0.60,
     ),
     # Softs
     "cotton": CommodityConfig(
         name="Cotton", ticker="CT=F", price_col="cotton_close",
-        dir_name="cotton", confidence_threshold=0.70,
+        dir_name="cotton", confidence_threshold=0.60,
     ),
     "lumber": CommodityConfig(
         # LBS=F (small lumber) was delisted by Yahoo ~2023; LBR=F is the
         # active Random Length Lumber futures contract.
         name="Lumber", ticker="LBR=F", price_col="lumber_close",
-        dir_name="lumber", confidence_threshold=0.70,
+        dir_name="lumber", confidence_threshold=0.60,
     ),
     "oj": CommodityConfig(
         name="Orange Juice", ticker="OJ=F", price_col="oj_close",
-        dir_name="oj", confidence_threshold=0.70,
+        dir_name="oj", confidence_threshold=0.60,
     ),
 }
 

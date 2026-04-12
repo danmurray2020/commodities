@@ -37,7 +37,7 @@ sys.path.insert(0, '.')
 from strategy import run_strategy_backtest, TradeConfig
 
 config = TradeConfig(
-    confidence_threshold=0.60,
+    confidence_threshold={cfg.confidence_threshold},
     stop_loss_pct=0.10,
     take_profit_multiplier=1.0,
     max_hold_days=63,
